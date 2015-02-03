@@ -48,10 +48,10 @@ create table resourcedefns (
 );
 
 
-insert into policydb.organizations (organization, data)
+insert into scepta.organizations (organization, data)
     values ('Overlord', '{ "name":"Overlord", "description":"The Overlord organization" }');
 
-insert into policydb.policygroups (organization, group, tag, data)
+insert into scepta.policygroups (organization, group, tag, data)
     values ('Overlord', 'RTGov', 'master', '{
     "description": "Runtime Governance policy group",
     "endpoints": [{
@@ -154,7 +154,7 @@ insert into policydb.policygroups (organization, group, tag, data)
     "name": "RTGov"
 }');
 
-insert into policydb.policies (organization, group, tag, policy, data)
+insert into scepta.policies (organization, group, tag, policy, data)
     values ('Overlord', 'RTGov', 'master', 'ActivityServer', '{
     "description": "Activity server for reporting activities related to runtime governance",
     "dependencies": [],
@@ -162,7 +162,7 @@ insert into policydb.policies (organization, group, tag, policy, data)
     "resources": []
 }');
 
-insert into policydb.policydefns (organization, group, tag, policy, data)
+insert into scepta.policydefns (organization, group, tag, policy, data)
     values ('Overlord', 'RTGov', 'master', 'ActivityServer', '<?xml version="1.0" encoding="UTF-8"?>
 <bean xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -193,7 +193,7 @@ insert into policydb.policydefns (organization, group, tag, policy, data)
 </beans>
 ');
 
-insert into policydb.policies (organization, group, tag, policy, data)
+insert into scepta.policies (organization, group, tag, policy, data)
     values ('Overlord', 'RTGov', 'master', 'ServiceDefinition', '{
     "description": "Convert activity units into a description of the activity that occurred within a service.",
     "dependencies": [{
@@ -205,7 +205,7 @@ insert into policydb.policies (organization, group, tag, policy, data)
     "resources": []
 }');
 
-insert into policydb.policydefns (organization, group, tag, policy, data)
+insert into scepta.policydefns (organization, group, tag, policy, data)
     values ('Overlord', 'RTGov', 'master', 'ServiceDefinition', '<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -225,7 +225,7 @@ insert into policydb.policydefns (organization, group, tag, policy, data)
   <bean id="serviceDefinitionProcessor" class="org.overlord.gov.examples.processor.ServiceDefinitionProcessor"/>
 </beans>');
 
-insert into policydb.policies (organization, group, tag, policy, data)
+insert into scepta.policies (organization, group, tag, policy, data)
     values ('Overlord', 'RTGov', 'master', 'ResponseTime', '{
     "description": "Convert service definitions into response time information.",
     "dependencies": [{
@@ -237,7 +237,7 @@ insert into policydb.policies (organization, group, tag, policy, data)
     "resources": []
 }');
 
-insert into policydb.policydefns (organization, group, tag, policy, data)
+insert into scepta.policydefns (organization, group, tag, policy, data)
     values ('Overlord', 'RTGov', 'master', 'ResponseTime', '<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -260,7 +260,7 @@ insert into policydb.policydefns (organization, group, tag, policy, data)
 
 </beans>');
 
-insert into policydb.policies (organization, group, tag, policy, data)
+insert into scepta.policies (organization, group, tag, policy, data)
     values ('Overlord', 'RTGov', 'master', 'SLA', '{
     "description": "Convert activity units into a description of the activity that occurred within a service.",
     "dependencies": [],
@@ -272,7 +272,7 @@ insert into policydb.policies (organization, group, tag, policy, data)
     }]
 }');
 
-insert into policydb.policydefns (organization, group, tag, policy, data)
+insert into scepta.policydefns (organization, group, tag, policy, data)
     values ('Overlord', 'RTGov', 'master', 'SLA', '<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -290,7 +290,7 @@ insert into policydb.policydefns (organization, group, tag, policy, data)
   </camelContext>
 </beans>');
 
-insert into policydb.resourcedefns (organization, group, tag, policy, resource, data)
+insert into scepta.resourcedefns (organization, group, tag, policy, resource, data)
     values ('Overlord', 'RTGov', 'master', 'SLA', 'SLAViolation.mvel', 'org.overlord.rtgov.analytics.situation.Situation sit=null;
 
 if (body.average > 200) {

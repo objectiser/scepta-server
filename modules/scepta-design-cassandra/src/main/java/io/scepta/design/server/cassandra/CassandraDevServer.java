@@ -35,7 +35,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CassandraDevServer extends AbstractDevServer {
     
-    private Cluster _cluster;
+    private static final String KEYSPACE = "scepta";
+
+	private Cluster _cluster;
     private Session _session;
     
     private static final ObjectMapper MAPPER=new ObjectMapper();
@@ -55,25 +57,25 @@ public class CassandraDevServer extends AbstractDevServer {
     protected void connect() {
         // Initialize cassandra
         _cluster = Cluster.builder().addContactPoint("127.0.0.1").build();
-        _session = _cluster.connect("policydb");
+        _session = _cluster.connect(KEYSPACE);
     }
     
     protected void initStatements() {
         // Create prepared statements
         _updateOrganization = _session.prepare(
-                "UPDATE policydb.organizations " +
+                "UPDATE scepta.organizations " +
                 "SET data = ? " +
                 "WHERE organization = ?;");
         
         _updatePolicyGroup = _session.prepare(
-                "UPDATE policydb.policygroups " +
+                "UPDATE scepta.policygroups " +
                 "SET data = ? " +
                 "WHERE organization = ? AND " +
                 "group = ? AND " +
                 "tag = '"+DevServer.MASTER_TAG+"';");
         
         _updatePolicy = _session.prepare(
-                "UPDATE policydb.policies " +
+                "UPDATE scepta.policies " +
                 "SET data = ? " +
                 "WHERE organization = ? AND " +
                 "group = ? AND " +
@@ -96,6 +98,7 @@ public class CassandraDevServer extends AbstractDevServer {
                 ret.add(MAPPER.readValue(data.getBytes(), Organization.class));
             } catch (Exception e) {
                 // TODO: HANDLE EXCEPTION
+            	e.printStackTrace();
             }
         }
         
@@ -140,6 +143,7 @@ public class CassandraDevServer extends AbstractDevServer {
                 return (MAPPER.readValue(data.getBytes(), Organization.class));
             } catch (Exception e) {
                 // TODO: HANDLE EXCEPTION
+            	e.printStackTrace();
             }
         }
         
@@ -169,6 +173,7 @@ public class CassandraDevServer extends AbstractDevServer {
                 ret.add(MAPPER.readValue(data.getBytes(), PolicyGroup.class));
             } catch (Exception e) {
                 // TODO: HANDLE EXCEPTION
+            	e.printStackTrace();
             }
         }
         
@@ -214,6 +219,7 @@ public class CassandraDevServer extends AbstractDevServer {
                 return (MAPPER.readValue(data.getBytes(), PolicyGroup.class));
             } catch (Exception e) {
                 // TODO: HANDLE EXCEPTION
+            	e.printStackTrace();
             }
         }
         
@@ -253,6 +259,7 @@ public class CassandraDevServer extends AbstractDevServer {
                 ret.add(MAPPER.readValue(data.getBytes(), Policy.class));
             } catch (Exception e) {
                 // TODO: HANDLE EXCEPTION
+            	e.printStackTrace();
             }
         }
         
@@ -299,6 +306,7 @@ public class CassandraDevServer extends AbstractDevServer {
                 return (MAPPER.readValue(data.getBytes(), Policy.class));
             } catch (Exception e) {
                 // TODO: HANDLE EXCEPTION
+            	e.printStackTrace();
             }
         }
         

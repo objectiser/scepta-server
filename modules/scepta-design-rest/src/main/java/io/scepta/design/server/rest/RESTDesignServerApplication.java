@@ -27,7 +27,7 @@ import java.util.Set;
  *
  */
 @ApplicationPath("/")
-public class RESTDevServerApplication extends Application {
+public class RESTDesignServerApplication extends Application {
 
     private static Set<Object> _singletons = new HashSet<Object>();
     private Set<Class<?>> _empty = new HashSet<Class<?>>();
@@ -35,10 +35,10 @@ public class RESTDevServerApplication extends Application {
     /**
      * This is the default constructor.
      */
-    public RESTDevServerApplication() {
+    public RESTDesignServerApplication() {
         synchronized (_singletons) {
             if (_singletons.isEmpty()) {
-                _singletons.add(new RESTDevServer());
+                _singletons.add(new RESTDesignServer());
             }
         }
     }

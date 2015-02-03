@@ -4,21 +4,21 @@
 
 <web-app>
     <distributable/> 
-    <display-name>Policy Development Server</display-name>
+    <display-name>Scepta Server</display-name>
 
     <servlet>
-        <servlet-name>PolicyDevServer</servlet-name>
+        <servlet-name>SceptaServer</servlet-name>
         <servlet-class>
             org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
         </servlet-class>
         <init-param>
             <param-name>javax.ws.rs.Application</param-name>
-            <param-value>org.overlord.gov.dev.server.rest.RESTDevServerApplication</param-value>
+            <param-value>io.scepta.design.server.rest.RESTDesignServerApplication</param-value>
         </init-param>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>PolicyDevServer</servlet-name>
+        <servlet-name>SceptaServer</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
 

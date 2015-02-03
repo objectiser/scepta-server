@@ -38,14 +38,14 @@ import javax.ws.rs.core.Response;
  *
  */
 @Path("/")
-public class RESTDevServer {
+public class RESTDesignServer {
 
     private DevServer _devServer=new CassandraDevServer();
 
     /**
      * This is the default constructor.
      */
-    public RESTDevServer() {
+    public RESTDesignServer() {
     }
     
     /**
