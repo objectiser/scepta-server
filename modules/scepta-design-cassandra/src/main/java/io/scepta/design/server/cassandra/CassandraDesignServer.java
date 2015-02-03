@@ -1,14 +1,15 @@
 /*
- * 2015 Red Hat Inc. and/or its affiliates and other contributors.
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates
+ * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,  
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -34,18 +35,18 @@ import com.datastax.driver.core.Session;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CassandraDesignServer extends AbstractDesignServer {
-    
+
     private static final String KEYSPACE = "scepta";
 
-	private Cluster _cluster;
+    private Cluster _cluster;
     private Session _session;
-    
+
     private static final ObjectMapper MAPPER=new ObjectMapper();
 
     private PreparedStatement _updateOrganization;
     private PreparedStatement _updatePolicyGroup;
     private PreparedStatement _updatePolicy;
-    
+
     /**
      * The default constructor.
      */
@@ -53,27 +54,27 @@ public class CassandraDesignServer extends AbstractDesignServer {
         connect();
         initStatements();
     }
-     
+
     protected void connect() {
         // Initialize cassandra
         _cluster = Cluster.builder().addContactPoint("127.0.0.1").build();
         _session = _cluster.connect(KEYSPACE);
     }
-    
+
     protected void initStatements() {
         // Create prepared statements
         _updateOrganization = _session.prepare(
                 "UPDATE scepta.organizations " +
                 "SET data = ? " +
                 "WHERE organization = ?;");
-        
+
         _updatePolicyGroup = _session.prepare(
                 "UPDATE scepta.policygroups " +
                 "SET data = ? " +
                 "WHERE organization = ? AND " +
                 "group = ? AND " +
                 "tag = '"+DesignServer.MASTER_TAG+"';");
-        
+
         _updatePolicy = _session.prepare(
                 "UPDATE scepta.policies " +
                 "SET data = ? " +
@@ -82,26 +83,26 @@ public class CassandraDesignServer extends AbstractDesignServer {
                 "tag = '"+DesignServer.MASTER_TAG+"' AND " +
                 "policy = ?;");
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected java.util.Set<Organization> doGetOrganizations() {
         java.util.Set<Organization> ret=new java.util.HashSet<Organization>();
-        
+
         ResultSet results = _session.execute("SELECT data FROM organizations");
         for (Row row : results) {
             try {
                 String data=row.getString("data");
-                
+
                 ret.add(MAPPER.readValue(data.getBytes(), Organization.class));
             } catch (Exception e) {
                 // TODO: HANDLE EXCEPTION
-            	e.printStackTrace();
+                e.printStackTrace();
             }
         }
-        
+
         return (ret);
     }
 
@@ -118,10 +119,10 @@ public class CassandraDesignServer extends AbstractDesignServer {
     @Override
     protected void doUpdateOrganization(Organization org) {
         BoundStatement boundStatement = new BoundStatement(_updateOrganization);
-        
+
         try {
             String data=MAPPER.writeValueAsString(org);
-            
+
             _session.execute(boundStatement.bind(data, org.getName()));
         } catch (Exception e) {
             // TODO: Handle exception
@@ -135,21 +136,21 @@ public class CassandraDesignServer extends AbstractDesignServer {
     @Override
     protected Organization doGetOrganization(String name) {
         Row row=_session.execute("SELECT data FROM organizations WHERE organization = '"+name+"'").one();
-        
+
         if (row != null) {
             try {
                 String data=row.getString("data");
-                
+
                 return (MAPPER.readValue(data.getBytes(), Organization.class));
             } catch (Exception e) {
                 // TODO: HANDLE EXCEPTION
-            	e.printStackTrace();
+                e.printStackTrace();
             }
         }
-        
+
         return (null);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -162,21 +163,21 @@ public class CassandraDesignServer extends AbstractDesignServer {
      * {@inheritDoc}
      */
     @Override
-    protected Set<PolicyGroup> doGetPolicyGroups(String org) {        
+    protected Set<PolicyGroup> doGetPolicyGroups(String org) {
         java.util.Set<PolicyGroup> ret=new java.util.HashSet<PolicyGroup>();
-        
+
         ResultSet results = _session.execute("SELECT data FROM policygroups WHERE organization='"+org+"'");
         for (Row row : results) {
             try {
                 String data=row.getString("data");
-                
+
                 ret.add(MAPPER.readValue(data.getBytes(), PolicyGroup.class));
             } catch (Exception e) {
                 // TODO: HANDLE EXCEPTION
-            	e.printStackTrace();
+                e.printStackTrace();
             }
         }
-        
+
         return (ret);
     }
 
@@ -193,10 +194,10 @@ public class CassandraDesignServer extends AbstractDesignServer {
     @Override
     protected void doUpdatePolicyGroup(String org, PolicyGroup group) {
         BoundStatement boundStatement = new BoundStatement(_updatePolicyGroup);
-        
+
         try {
             String data=MAPPER.writeValueAsString(group);
-            
+
             _session.execute(boundStatement.bind(data, org, group.getName()));
         } catch (Exception e) {
             // TODO: Handle exception
@@ -211,18 +212,18 @@ public class CassandraDesignServer extends AbstractDesignServer {
     protected PolicyGroup doGetPolicyGroup(String org, String group, String tag) {
         Row row=_session.execute("SELECT data FROM policygroups WHERE organization = '"+org
                 +"' AND group = '"+group+"' AND tag = '"+tag+"'").one();
-        
+
         if (row != null) {
             try {
                 String data=row.getString("data");
-                
+
                 return (MAPPER.readValue(data.getBytes(), PolicyGroup.class));
             } catch (Exception e) {
                 // TODO: HANDLE EXCEPTION
-            	e.printStackTrace();
+                e.printStackTrace();
             }
         }
-        
+
         return (null);
     }
 
@@ -249,20 +250,20 @@ public class CassandraDesignServer extends AbstractDesignServer {
     @Override
     protected Set<Policy> doGetPolicies(String org, String group, String tag) {
         java.util.Set<Policy> ret=new java.util.HashSet<Policy>();
-        
+
         ResultSet results = _session.execute("SELECT data FROM policies WHERE organization='"+org
                             +"' AND group = '"+group+"' AND tag = '"+tag+"'");
         for (Row row : results) {
             try {
                 String data=row.getString("data");
-                
+
                 ret.add(MAPPER.readValue(data.getBytes(), Policy.class));
             } catch (Exception e) {
                 // TODO: HANDLE EXCEPTION
-            	e.printStackTrace();
+                e.printStackTrace();
             }
         }
-        
+
         return (ret);
     }
 
@@ -279,10 +280,10 @@ public class CassandraDesignServer extends AbstractDesignServer {
     @Override
     protected void doUpdatePolicy(String org, String group, Policy policy) {
         BoundStatement boundStatement = new BoundStatement(_updatePolicy);
-        
+
         try {
             String data=MAPPER.writeValueAsString(policy);
-            
+
             _session.execute(boundStatement.bind(data, org, group, policy.getName()));
         } catch (Exception e) {
             // TODO: Handle exception
@@ -298,18 +299,18 @@ public class CassandraDesignServer extends AbstractDesignServer {
         Row row=_session.execute("SELECT data FROM policies WHERE organization = '"+org
                 +"' AND group = '"+group+"' AND tag = '"+tag+"' AND policy = '"
                 +policy+"'").one();
-        
+
         if (row != null) {
             try {
                 String data=row.getString("data");
-                
+
                 return (MAPPER.readValue(data.getBytes(), Policy.class));
             } catch (Exception e) {
                 // TODO: HANDLE EXCEPTION
-            	e.printStackTrace();
+                e.printStackTrace();
             }
         }
-        
+
         return (null);
     }
 
@@ -321,11 +322,11 @@ public class CassandraDesignServer extends AbstractDesignServer {
         Row row=_session.execute("SELECT data FROM policydefns WHERE organization = '"+org
                 +"' AND group = '"+group+"' AND tag = '"+tag+"' AND policy = '"
                 +policy+"'").one();
-        
+
         if (row != null) {
             return (row.getString("data"));
         }
-        
+
         return (null);
     }
 
@@ -347,11 +348,11 @@ public class CassandraDesignServer extends AbstractDesignServer {
         Row row=_session.execute("SELECT data FROM resourcedefns WHERE organization = '"+org
                 +"' AND group = '"+group+"' AND tag = '"+tag+"' AND policy = '"
                 +policy+"' AND resource = '"+resource+"'").one();
-        
+
         if (row != null) {
             return (row.getString("data"));
         }
-        
+
         return (null);
     }
 

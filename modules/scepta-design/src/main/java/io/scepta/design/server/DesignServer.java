@@ -1,14 +1,15 @@
 /*
- * 2015 Red Hat Inc. and/or its affiliates and other contributors.
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates
+ * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,  
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -35,27 +36,26 @@ import io.scepta.design.model.Tag;
 // (i.e. passing the user details in operations, or verifying authorized user outside of the
 // DevServer API? But then how to make consistent across uses of this API?
 
-
 public interface DesignServer {
 
-    public static final String MASTER_TAG = "master";
+    String MASTER_TAG = "master";
 
-    public java.util.Set<Organization> getOrganizations();
-    
-    public void addOrganization(Organization org);
-    
-    public void updateOrganization(Organization org);
-    
-    public Organization getOrganization(String name);
-    
-    public Organization removeOrganization(String name);
-    
-    public java.util.Set<PolicyGroup> getPolicyGroups(String org);
+    java.util.Set<Organization> getOrganizations();
 
-    public void addPolicyGroup(String org, PolicyGroup group);
-    
-    public void updatePolicyGroup(String org, PolicyGroup group);
-    
+    void addOrganization(Organization org);
+
+    void updateOrganization(Organization org);
+
+    Organization getOrganization(String name);
+
+    Organization removeOrganization(String name);
+
+    java.util.Set<PolicyGroup> getPolicyGroups(String org);
+
+    void addPolicyGroup(String org, PolicyGroup group);
+
+    void updatePolicyGroup(String org, PolicyGroup group);
+
     /**
      * This method returns the policy group associated with the
      * supplied name, within the specified organization and
@@ -63,43 +63,43 @@ public interface DesignServer {
      * then it will return the policy group with that tag value.
      * However if not specified, then the current instance of the
      * policy group will be returned.
-     * 
+     *
      * @param org The organization
      * @param group The name of the policy group
      * @param tag The optional tag
      * @return The policy group, or null if no found
      */
-    public PolicyGroup getPolicyGroup(String org, String group, String tag);
-    
+    PolicyGroup getPolicyGroup(String org, String group, String tag);
+
     /**
      * This method will remove a policy group, and associated policies,
      * endpoints, etc. This task will only remove the current version
      * of a policy group (if exists), but not any tagged versions.
-     * 
+     *
      * @param org The organization
      * @param group The policy group name
      * @return The removed policy group, or null if not found
      */
-    public PolicyGroup removePolicyGroup(String org, String group);
-    
-    public java.util.List<Tag> getTags(String org, String group);
-    
-    public java.util.Set<Policy> getPolicies(String org, String group, String tag);
+    PolicyGroup removePolicyGroup(String org, String group);
 
-    public void addPolicy(String org, String group, Policy policy);
-    
-    public void updatePolicy(String org, String group, Policy policy);
-    
-    public Policy getPolicy(String org, String group, String tag, String policy);
-    
-    public String getPolicyDefinition(String org, String group, String tag, String policy);
-    
-    public void setPolicyDefinition(String org, String group, String policy, String definition);
-    
-    public String getResourceDefinition(String org, String group, String tag, String policy, String resource);
-    
-    public void setResourceDefinition(String org, String group, String policy, String resource, String definition);
-    
-    public Policy removePolicy(String org, String group, String policy);
-    
+    java.util.List<Tag> getTags(String org, String group);
+
+    java.util.Set<Policy> getPolicies(String org, String group, String tag);
+
+    void addPolicy(String org, String group, Policy policy);
+
+    void updatePolicy(String org, String group, Policy policy);
+
+    Policy getPolicy(String org, String group, String tag, String policy);
+
+    String getPolicyDefinition(String org, String group, String tag, String policy);
+
+    void setPolicyDefinition(String org, String group, String policy, String definition);
+
+    String getResourceDefinition(String org, String group, String tag, String policy, String resource);
+
+    void setResourceDefinition(String org, String group, String policy, String resource, String definition);
+
+    Policy removePolicy(String org, String group, String policy);
+
 }

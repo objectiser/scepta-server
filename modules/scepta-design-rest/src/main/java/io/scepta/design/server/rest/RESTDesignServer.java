@@ -1,14 +1,15 @@
 /*
- * 2012-3 Red Hat Inc. and/or its affiliates and other contributors.
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates
+ * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,  
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -47,10 +48,10 @@ public class RESTDesignServer {
      */
     public RESTDesignServer() {
     }
-    
+
     /**
      * This method returns the list of available organizations.
-     * 
+     *
      * @return The list of organizations
      */
     @GET
@@ -59,11 +60,11 @@ public class RESTDesignServer {
     public Response getOrganizations() {
         return (success(_devServer.getOrganizations()));
     }
-    
+
     /**
      * This method returns the organization associated with the
      * supplied name.
-     * 
+     *
      * @param orgName The organization name
      * @return The organization or null if not found
      */
@@ -77,7 +78,7 @@ public class RESTDesignServer {
     /**
      * This method updates the organization associated with the
      * supplied name.
-     * 
+     *
      * @param orgName The organization name
      * @param organization The organization
      * @return Whether the operation was successful
@@ -90,10 +91,10 @@ public class RESTDesignServer {
 
         return (success());
     }
-    
+
     /**
      * This method determines the CORS header values for accessing an organization.
-     * 
+     *
      * @param servletResponse The servlet response
      * @return No relevant
      */
@@ -107,11 +108,11 @@ public class RESTDesignServer {
         servletResponse.addHeader("Access-Control-Max-Age","60");
         return (null);
     }
-    
+
     /**
      * This method returns the policy groups associated with the
      * organiation name.
-     * 
+     *
      * @param orgName The organization name
      * @return The policy groups
      */
@@ -125,7 +126,7 @@ public class RESTDesignServer {
     /**
      * This method returns the policy group associated with the
      * organization name and group name.
-     * 
+     *
      * @param orgName The organization name
      * @param groupName The policy group name
      * @return The policy groups
@@ -141,7 +142,7 @@ public class RESTDesignServer {
 
     /**
      * This method updates a policy group.
-     * 
+     *
      * @param orgName The organization name
      * @param groupName The policy group name
      * @param group The policy group
@@ -152,17 +153,17 @@ public class RESTDesignServer {
     @Consumes("application/json")
     public Response setPolicyGroup(@PathParam("orgName") String orgName,
             @PathParam("groupName") String groupName, PolicyGroup group) {
-        
+
         // TODO: Check if group name matches
-        
+
         _devServer.updatePolicyGroup(orgName, group);
 
         return (success());
     }
-    
+
     /**
      * This method determines the CORS header values for accessing a policy group.
-     * 
+     *
      * @param servletResponse The servlet response
      * @return No relevant
      */
@@ -176,11 +177,11 @@ public class RESTDesignServer {
         servletResponse.addHeader("Access-Control-Max-Age","60");
         return (null);
     }
-    
+
     /**
      * This method returns the list of policies associated with the
      * organization and group name.
-     * 
+     *
      * @param orgName The organization name
      * @param groupName The policy group name
      * @return The list of policies
@@ -197,7 +198,7 @@ public class RESTDesignServer {
     /**
      * This method returns the policy associated with the
      * organization, group and policy name.
-     * 
+     *
      * @param orgName The organization name
      * @param groupName The policy group name
      * @param policyName The policy name
@@ -216,7 +217,7 @@ public class RESTDesignServer {
 
     /**
      * This method updates a policy.
-     * 
+     *
      * @param orgName The organization name
      * @param groupName The policy group name
      * @param policyName The policy name
@@ -230,17 +231,17 @@ public class RESTDesignServer {
                     @PathParam("groupName") String groupName,
                     @PathParam("policyName") String policyName,
                     Policy policy) {
-        
+
         // TODO: Check if policy name matches
-        
+
         _devServer.updatePolicy(orgName, groupName, policy);
 
         return (success());
     }
-    
+
     /**
      * This method determines the CORS header values for accessing a policy.
-     * 
+     *
      * @param servletResponse The servlet response
      * @return No relevant
      */
@@ -254,11 +255,11 @@ public class RESTDesignServer {
         servletResponse.addHeader("Access-Control-Max-Age","60");
         return (null);
     }
-    
+
     /**
      * This method returns the policy definition associated with the
      * organization, group and policy name.
-     * 
+     *
      * @param orgName The organization name
      * @param groupName The policy group name
      * @param policyName The policy name
@@ -278,7 +279,7 @@ public class RESTDesignServer {
     /**
      * This method returns the policy definition associated with the
      * organization, group and policy name.
-     * 
+     *
      * @param orgName The organization name
      * @param groupName The policy group name
      * @param policyName The policy name
@@ -299,7 +300,7 @@ public class RESTDesignServer {
 
     /**
      * This method returns a successful response.
-     * 
+     *
      * @param result The result to be returned
      * @return The successful response
      */
@@ -317,7 +318,7 @@ public class RESTDesignServer {
 
     /**
      * This method returns a successful response.
-     * 
+     *
      * @return The successful response
      */
     protected Response success() {
@@ -330,5 +331,4 @@ public class RESTDesignServer {
                 .header("Access-Control-Max-Age", "1209600")
                 .build());
     }
-
 }

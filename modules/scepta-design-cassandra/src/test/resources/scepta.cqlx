@@ -1,3 +1,19 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates
+ * and other contributors as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 drop keyspace scepta;
 
@@ -215,11 +231,11 @@ insert into scepta.policydefns (organization, group, tag, policy, data)
          http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
   <camelContext xmlns="http://camel.apache.org/schema/spring">
-	  <route id="servicedefn">
-		  <from uri="scepta:activityunits"/>
-          <to uri="serviceDefinitionProcessor"/> 
-		  <inOnly uri="scepta:servicedefns" />
-	  </route>
+    <route id="servicedefn">
+      <from uri="scepta:activityunits"/>
+      <to uri="serviceDefinitionProcessor"/>
+      <inOnly uri="scepta:servicedefns" />
+    </route>
   </camelContext>
 
   <bean id="serviceDefinitionProcessor" class="org.overlord.gov.examples.processor.ServiceDefinitionProcessor"/>
@@ -247,13 +263,11 @@ insert into scepta.policydefns (organization, group, tag, policy, data)
          http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
   <camelContext xmlns="http://camel.apache.org/schema/spring">
-
-	  <route id="responsetime">
-		  <from uri="activemq:queue:servicedefns?maxConcurrentConsumers=30"/>
-          <to uri="responseTimeProcessor"/> 
-		  <inOnly uri="activemq:queue:responsetimes" />
-	  </route>
-
+    <route id="responsetime">
+      <from uri="activemq:queue:servicedefns?maxConcurrentConsumers=30"/>
+      <to uri="responseTimeProcessor"/>
+      <inOnly uri="activemq:queue:responsetimes" />
+    </route>
   </camelContext>
 
   <bean id="responseTimeProcessor" class="org.overlord.gov.examples.processor.ResponseTimeProcessor"/>
@@ -282,11 +296,11 @@ insert into scepta.policydefns (organization, group, tag, policy, data)
          http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
   <camelContext xmlns="http://camel.apache.org/schema/spring">
-	  <route id="sla">
-		  <from uri="scepta:responsetimes"/>
-          <to uri="mvel:SLAViolation.mvel"/> 
-		  <inOnly uri="scepta:situations" />
-	  </route>
+    <route id="sla">
+      <from uri="scepta:responsetimes"/>
+      <to uri="mvel:SLAViolation.mvel"/>
+      <inOnly uri="scepta:situations" />
+    </route>
   </camelContext>
 </beans>');
 
@@ -294,34 +308,34 @@ insert into scepta.resourcedefns (organization, group, tag, policy, resource, da
     values ('Overlord', 'RTGov', 'master', 'SLA', 'SLAViolation.mvel', 'org.overlord.rtgov.analytics.situation.Situation sit=null;
 
 if (body.average > 200) {
-	sit = new org.overlord.rtgov.analytics.situation.Situation();
-	
-	sit.setType("SLA Violation");
-	sit.setSubject(org.overlord.rtgov.analytics.situation.Situation.createSubject(body.getServiceType(),
-					body.getOperation(), body.getFault()));
-	sit.setTimestamp(java.lang.System.currentTimeMillis());
-	
-	sit.getProperties().putAll(body.getProperties());
+    sit = new org.overlord.rtgov.analytics.situation.Situation();
 
-	if (body.getRequestId() != null) {
-		sit.getActivityTypeIds().add(body.getRequestId());
-	}
-	if (body.getResponseId() != null) {
-		sit.getActivityTypeIds().add(body.getResponseId());
-	}
-	
-	sit.getContext().addAll(body.getContext());
-	
-	String serviceName=body.getServiceType();
-	
-	if (serviceName.startsWith("{")) {
-		serviceName = javax.xml.namespace.QName.valueOf(serviceName).getLocalPart();
-	}
-	
-	sit.setDescription(serviceName+" exceeded maximum response time of 200 ms");
-	sit.setSeverity(org.overlord.rtgov.analytics.situation.Situation.Severity.Low);
+    sit.setType("SLA Violation");
+    sit.setSubject(org.overlord.rtgov.analytics.situation.Situation.createSubject(body.getServiceType(),
+            body.getOperation(), body.getFault()));
+    sit.setTimestamp(java.lang.System.currentTimeMillis());
+
+    sit.getProperties().putAll(body.getProperties());
+
+    if (body.getRequestId() != null) {
+        sit.getActivityTypeIds().add(body.getRequestId());
+    }
+    if (body.getResponseId() != null) {
+        sit.getActivityTypeIds().add(body.getResponseId());
+    }
+
+    sit.getContext().addAll(body.getContext());
+
+    String serviceName=body.getServiceType();
+
+    if (serviceName.startsWith("{")) {
+        serviceName = javax.xml.namespace.QName.valueOf(serviceName).getLocalPart();
+    }
+
+    sit.setDescription(serviceName+" exceeded maximum response time of 200 ms");
+    sit.setSeverity(org.overlord.rtgov.analytics.situation.Situation.Severity.Low);
 }
-	
+
 return sit;');
 
 

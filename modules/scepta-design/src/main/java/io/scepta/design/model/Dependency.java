@@ -1,14 +1,15 @@
 /*
- * 2015 Red Hat Inc. and/or its affiliates and other contributors.
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates
+ * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,  
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -32,29 +33,29 @@ public class Dependency {
     private String _groupId;
     private String _artifactId;
     private String _version;
-    
+
     public String getGroupId() {
         return (_groupId);
     }
-    
+
     public Dependency setGroupId(String groupId) {
         _groupId = groupId;
         return (this);
     }
-    
+
     public String getArtifactId() {
         return (_artifactId);
     }
-    
+
     public Dependency setArtifactId(String artifactId) {
         _artifactId = artifactId;
         return (this);
     }
-    
+
     public String getVersion() {
         return (_version);
     }
-    
+
     public Dependency setVersion(String version) {
         _version = version;
         return (this);
