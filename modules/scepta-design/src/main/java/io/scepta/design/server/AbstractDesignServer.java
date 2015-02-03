@@ -20,7 +20,7 @@ import io.scepta.design.model.Policy;
 import io.scepta.design.model.PolicyGroup;
 import io.scepta.design.model.Tag;
 
-public abstract class AbstractDevServer implements DevServer {
+public abstract class AbstractDesignServer implements DesignServer {
 
     /**
      * {@inheritDoc}

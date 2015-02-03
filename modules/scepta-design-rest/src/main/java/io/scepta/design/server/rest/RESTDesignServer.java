@@ -18,8 +18,8 @@ package io.scepta.design.server.rest;
 import io.scepta.design.model.Organization;
 import io.scepta.design.model.Policy;
 import io.scepta.design.model.PolicyGroup;
-import io.scepta.design.server.DevServer;
-import io.scepta.design.server.cassandra.CassandraDevServer;
+import io.scepta.design.server.DesignServer;
+import io.scepta.design.server.cassandra.CassandraDesignServer;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -34,13 +34,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 /**
- * This class represents the RESTful interface to the policy development server.
+ * This class represents the RESTful interface to the scepta design server.
  *
  */
-@Path("/")
+@Path("/design")
 public class RESTDesignServer {
 
-    private DevServer _devServer=new CassandraDevServer();
+    private DesignServer _devServer=new CassandraDesignServer();
 
     /**
      * This is the default constructor.

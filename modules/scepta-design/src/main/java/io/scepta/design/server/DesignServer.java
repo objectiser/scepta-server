@@ -36,7 +36,7 @@ import io.scepta.design.model.Tag;
 // DevServer API? But then how to make consistent across uses of this API?
 
 
-public interface DevServer {
+public interface DesignServer {
 
     public static final String MASTER_TAG = "master";
 

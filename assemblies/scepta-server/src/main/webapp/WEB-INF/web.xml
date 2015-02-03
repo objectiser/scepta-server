@@ -19,7 +19,7 @@
 
     <servlet-mapping>
         <servlet-name>SceptaServer</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/design/*</url-pattern>
     </servlet-mapping>
 
 </web-app>

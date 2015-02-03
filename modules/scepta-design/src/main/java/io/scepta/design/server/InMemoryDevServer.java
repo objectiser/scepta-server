@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public class InMemoryDevServer extends AbstractDevServer {
+public class InMemoryDevServer extends AbstractDesignServer {
 
     private java.util.Set<Organization> _organizations=new java.util.HashSet<Organization>();
     private java.util.Map<Organization, java.util.Set<PolicyGroup>> _groups=new java.util.HashMap<Organization, java.util.Set<PolicyGroup>>();

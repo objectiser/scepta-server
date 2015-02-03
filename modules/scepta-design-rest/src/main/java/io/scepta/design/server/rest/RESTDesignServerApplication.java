@@ -26,7 +26,7 @@ import java.util.Set;
  * development server.
  *
  */
-@ApplicationPath("/")
+@ApplicationPath("/design")
 public class RESTDesignServerApplication extends Application {
 
     private static Set<Object> _singletons = new HashSet<Object>();
