@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public class InMemoryDesignServer extends AbstractDesignServer {
+public class InMemoryDesignRepository extends AbstractDesignRepository {
 
     private java.util.Set<Organization> _organizations=new java.util.HashSet<Organization>();
     private java.util.Map<Organization, java.util.Set<PolicyGroup>> _groups=
@@ -39,7 +39,7 @@ public class InMemoryDesignServer extends AbstractDesignServer {
     /**
      * The default constructor.
      */
-    public InMemoryDesignServer() {
+    public InMemoryDesignRepository() {
         // Create default organization
         _organizations.add(new Organization().setName("default"));
     }

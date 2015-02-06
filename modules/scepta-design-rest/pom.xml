@@ -36,10 +36,6 @@
       <groupId>io.scepta</groupId>
       <artifactId>scepta-design</artifactId>
     </dependency>
-    <dependency>
-      <groupId>io.scepta</groupId>
-      <artifactId>scepta-design-cassandra</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>javax</groupId>

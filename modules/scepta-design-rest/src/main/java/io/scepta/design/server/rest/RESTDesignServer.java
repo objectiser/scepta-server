@@ -19,8 +19,7 @@ package io.scepta.design.server.rest;
 import io.scepta.design.model.Organization;
 import io.scepta.design.model.Policy;
 import io.scepta.design.model.PolicyGroup;
-import io.scepta.design.server.DesignServer;
-import io.scepta.design.server.cassandra.CassandraDesignServer;
+import io.scepta.design.server.AbstractDesignServer;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -39,9 +38,7 @@ import javax.ws.rs.core.Response;
  *
  */
 @Path("/design")
-public class RESTDesignServer {
-
-    private DesignServer _devServer=new CassandraDesignServer();
+public class RESTDesignServer extends AbstractDesignServer {
 
     /**
      * This is the default constructor.
@@ -58,7 +55,7 @@ public class RESTDesignServer {
     @Path("/")
     @Produces("application/json")
     public Response getOrganizations() {
-        return (success(_devServer.getOrganizations()));
+        return (success(getRepository().getOrganizations()));
     }
 
     /**
@@ -72,7 +69,7 @@ public class RESTDesignServer {
     @Path("/{orgName}")
     @Produces("application/json")
     public Response getOrganization(@PathParam("orgName") String orgName) {
-        return (success(_devServer.getOrganization(orgName)));
+        return (success(getRepository().getOrganization(orgName)));
     }
 
     /**
@@ -87,7 +84,7 @@ public class RESTDesignServer {
     @Path("/{orgName}")
     @Consumes("application/json")
     public Response setOrganization(@PathParam("orgName") String orgName, Organization organization) {
-        _devServer.updateOrganization(organization);
+        getRepository().updateOrganization(organization);
 
         return (success());
     }
@@ -120,7 +117,7 @@ public class RESTDesignServer {
     @Path("/{orgName}/group")
     @Produces("application/json")
     public Response getPolicyGroups(@PathParam("orgName") String orgName) {
-        return (success(_devServer.getPolicyGroups(orgName)));
+        return (success(getRepository().getPolicyGroups(orgName)));
     }
 
     /**
@@ -137,7 +134,25 @@ public class RESTDesignServer {
     public Response getPolicyGroup(@PathParam("orgName") String orgName,
                                     @PathParam("groupName") String groupName,
                                     @QueryParam("tag") String tag) {
-        return (success(_devServer.getPolicyGroup(orgName, groupName, tag)));
+        return (success(getRepository().getPolicyGroup(orgName, groupName, tag)));
+    }
+
+    /**
+     * This method exports the policy group associated with the
+     * organization, group and optional tag name.
+     *
+     * @param orgName The organization name
+     * @param groupName The policy group name
+     * @param tag The optional tag name
+     * @return Export representation of the policy group
+     */
+    @GET
+    @Path("/{orgName}/group/{groupName}/export")
+    @Produces("application/json")
+    public Response export(@PathParam("orgName") String orgName,
+                                    @PathParam("groupName") String groupName,
+                                    @QueryParam("tag") String tag) {
+        return (success(exportPolicyGroup(orgName, groupName, tag)));
     }
 
     /**
@@ -156,7 +171,7 @@ public class RESTDesignServer {
 
         // TODO: Check if group name matches
 
-        _devServer.updatePolicyGroup(orgName, group);
+        getRepository().updatePolicyGroup(orgName, group);
 
         return (success());
     }
@@ -192,7 +207,7 @@ public class RESTDesignServer {
     public Response getPolicies(@PathParam("orgName") String orgName,
                                     @PathParam("groupName") String groupName,
                                     @QueryParam("tag") String tag) {
-        return (success(_devServer.getPolicies(orgName, groupName, tag)));
+        return (success(getRepository().getPolicies(orgName, groupName, tag)));
     }
 
     /**
@@ -212,7 +227,7 @@ public class RESTDesignServer {
                                     @PathParam("groupName") String groupName,
                                     @PathParam("policyName") String policyName,
                                     @QueryParam("tag") String tag) {
-        return (success(_devServer.getPolicy(orgName, groupName, tag, policyName)));
+        return (success(getRepository().getPolicy(orgName, groupName, tag, policyName)));
     }
 
     /**
@@ -234,7 +249,7 @@ public class RESTDesignServer {
 
         // TODO: Check if policy name matches
 
-        _devServer.updatePolicy(orgName, groupName, policy);
+        getRepository().updatePolicy(orgName, groupName, policy);
 
         return (success());
     }
@@ -273,7 +288,7 @@ public class RESTDesignServer {
                                     @PathParam("groupName") String groupName,
                                     @PathParam("policyName") String policyName,
                                     @QueryParam("tag") String tag) {
-        return (success(_devServer.getPolicyDefinition(orgName, groupName, tag, policyName)));
+        return (success(getRepository().getPolicyDefinition(orgName, groupName, tag, policyName)));
     }
 
     /**
@@ -295,7 +310,7 @@ public class RESTDesignServer {
                                     @PathParam("policyName") String policyName,
                                     @PathParam("resourceName") String resourceName,
                                     @QueryParam("tag") String tag) {
-        return (success(_devServer.getResourceDefinition(orgName, groupName, tag, policyName, resourceName)));
+        return (success(getRepository().getResourceDefinition(orgName, groupName, tag, policyName, resourceName)));
     }
 
     /**

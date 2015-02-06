@@ -20,8 +20,8 @@ import io.scepta.design.model.Organization;
 import io.scepta.design.model.Policy;
 import io.scepta.design.model.PolicyGroup;
 import io.scepta.design.model.Tag;
-import io.scepta.design.server.AbstractDesignServer;
-import io.scepta.design.server.DesignServer;
+import io.scepta.design.server.AbstractDesignRepository;
+import io.scepta.design.server.DesignRepository;
 
 import java.util.List;
 import java.util.Set;
@@ -34,7 +34,7 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class CassandraDesignServer extends AbstractDesignServer {
+public class CassandraDesignRepository extends AbstractDesignRepository {
 
     private static final String KEYSPACE = "scepta";
 
@@ -50,7 +50,7 @@ public class CassandraDesignServer extends AbstractDesignServer {
     /**
      * The default constructor.
      */
-    public CassandraDesignServer() {
+    public CassandraDesignRepository() {
         connect();
         initStatements();
     }
@@ -73,14 +73,14 @@ public class CassandraDesignServer extends AbstractDesignServer {
                 "SET data = ? " +
                 "WHERE organization = ? AND " +
                 "group = ? AND " +
-                "tag = '"+DesignServer.MASTER_TAG+"';");
+                "tag = '"+DesignRepository.MASTER_TAG+"';");
 
         _updatePolicy = _session.prepare(
                 "UPDATE scepta.policies " +
                 "SET data = ? " +
                 "WHERE organization = ? AND " +
                 "group = ? AND " +
-                "tag = '"+DesignServer.MASTER_TAG+"' AND " +
+                "tag = '"+DesignRepository.MASTER_TAG+"' AND " +
                 "policy = ?;");
     }
 
