@@ -19,7 +19,7 @@ package io.scepta.design.server;
 import io.scepta.design.model.Policy;
 import io.scepta.design.model.PolicyGroup;
 
-public class ImportExportDefinition {
+public class PolicyGroupInterchange {
 
     private PolicyGroup _groupDetails;
     private java.util.Set<Policy> _policyDetails;
@@ -30,7 +30,7 @@ public class ImportExportDefinition {
         return (_groupDetails);
     }
 
-    public ImportExportDefinition setGroupDetails(PolicyGroup groupDetails) {
+    public PolicyGroupInterchange setGroupDetails(PolicyGroup groupDetails) {
         _groupDetails = groupDetails;
 
         return (this);
@@ -40,7 +40,7 @@ public class ImportExportDefinition {
         return (_policyDetails);
     }
 
-    public ImportExportDefinition setPolicyDetails(java.util.Set<Policy> policyDetails) {
+    public PolicyGroupInterchange setPolicyDetails(java.util.Set<Policy> policyDetails) {
         _policyDetails = policyDetails;
 
         return (this);
@@ -50,7 +50,7 @@ public class ImportExportDefinition {
         return (_policyDefinitions);
     }
 
-    public ImportExportDefinition setPolicyDefinitions(java.util.Map<String,String> policyDefinitions) {
+    public PolicyGroupInterchange setPolicyDefinitions(java.util.Map<String,String> policyDefinitions) {
         _policyDefinitions = policyDefinitions;
 
         return (this);
@@ -60,7 +60,7 @@ public class ImportExportDefinition {
         return (_resourceDefinitions);
     }
 
-    public ImportExportDefinition setResourceDefinitions(java.util.Map<String,String> resourceDefinitions) {
+    public PolicyGroupInterchange setResourceDefinitions(java.util.Map<String,String> resourceDefinitions) {
         _resourceDefinitions = resourceDefinitions;
 
         return (this);

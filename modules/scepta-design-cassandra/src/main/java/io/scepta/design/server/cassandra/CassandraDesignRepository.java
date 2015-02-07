@@ -43,9 +43,16 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
 
     private static final ObjectMapper MAPPER=new ObjectMapper();
 
+    private PreparedStatement _insertOrganization;
+    private PreparedStatement _insertPolicyGroup;
+    private PreparedStatement _insertPolicy;
+    private PreparedStatement _insertPolicyDefinition;
+    private PreparedStatement _insertResourceDefinition;
     private PreparedStatement _updateOrganization;
     private PreparedStatement _updatePolicyGroup;
     private PreparedStatement _updatePolicy;
+    private PreparedStatement _updatePolicyDefinition;
+    private PreparedStatement _updateResourceDefinition;
 
     /**
      * The default constructor.
@@ -63,6 +70,31 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
 
     protected void initStatements() {
         // Create prepared statements
+        _insertOrganization = _session.prepare(
+                "INSERT INTO scepta.organizations " +
+                "(organization, data) " +
+                "VALUES (?,?);");
+
+        _insertPolicyGroup = _session.prepare(
+                "INSERT INTO scepta.policygroups " +
+                "(organization, group, tag, data)" +
+                "VALUES (?,?,?,?);");
+
+        _insertPolicy = _session.prepare(
+                "INSERT INTO scepta.policies " +
+                "(organization, group, tag, policy, data)" +
+                "VALUES (?,?,?,?,?);");
+
+        _insertPolicyDefinition = _session.prepare(
+                "INSERT INTO scepta.policydefns " +
+                "(organization, group, tag, policy, data)" +
+                "VALUES (?,?,?,?,?);");
+
+        _insertResourceDefinition = _session.prepare(
+                "INSERT INTO scepta.resourcedefns " +
+                "(organization, group, tag, policy, resource, data)" +
+                "VALUES (?,?,?,?,?,?);");
+
         _updateOrganization = _session.prepare(
                 "UPDATE scepta.organizations " +
                 "SET data = ? " +
@@ -82,6 +114,23 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
                 "group = ? AND " +
                 "tag = '"+DesignRepository.MASTER_TAG+"' AND " +
                 "policy = ?;");
+
+        _updatePolicyDefinition = _session.prepare(
+                "UPDATE scepta.policydefns " +
+                "SET data = ? " +
+                "WHERE organization = ? AND " +
+                "group = ? AND " +
+                "tag = '"+DesignRepository.MASTER_TAG+"' AND " +
+                "policy = ?;");
+
+        _updateResourceDefinition = _session.prepare(
+                "UPDATE scepta.resourcedefns " +
+                "SET data = ? " +
+                "WHERE organization = ? AND " +
+                "group = ? AND " +
+                "tag = '"+DesignRepository.MASTER_TAG+"' AND " +
+                "policy = ? AND " +
+                "resource = ?;");
     }
 
     /**
@@ -111,6 +160,16 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
      */
     @Override
     protected void doAddOrganization(Organization org) {
+        BoundStatement boundStatement = new BoundStatement(_insertOrganization);
+
+        try {
+            String data=MAPPER.writeValueAsString(org);
+
+            _session.execute(boundStatement.bind(org.getName(), data));
+        } catch (Exception e) {
+            // TODO: Handle exception
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -186,6 +245,16 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
      */
     @Override
     protected void doAddPolicyGroup(String org, PolicyGroup group) {
+        BoundStatement boundStatement = new BoundStatement(_insertPolicyGroup);
+
+        try {
+            String data=MAPPER.writeValueAsString(group);
+
+            _session.execute(boundStatement.bind(org, group.getName(), MASTER_TAG, data));
+        } catch (Exception e) {
+            // TODO: Handle exception
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -272,6 +341,16 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
      */
     @Override
     protected void doAddPolicy(String org, String group, Policy policy) {
+        BoundStatement boundStatement = new BoundStatement(_insertPolicy);
+
+        try {
+            String data=MAPPER.writeValueAsString(policy);
+
+            _session.execute(boundStatement.bind(org, group, MASTER_TAG, policy.getName(), data));
+        } catch (Exception e) {
+            // TODO: Handle exception
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -334,9 +413,26 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected void doSetPolicyDefinition(String org, String group, String policy, String definition) {
-        // Exception ???
-        throw new RuntimeException("Unable to find policy '"+policy+"'");
+    protected void doSetPolicyDefinition(String org, String group, String policy, String data) {
+        if (doGetPolicyDefinition(org, group, MASTER_TAG, policy) == null) {
+            BoundStatement boundStatement = new BoundStatement(_insertPolicyDefinition);
+
+            try {
+                _session.execute(boundStatement.bind(org, group, MASTER_TAG, policy, data));
+            } catch (Exception e) {
+                // TODO: Handle exception
+                e.printStackTrace();
+            }
+        } else {
+            BoundStatement boundStatement = new BoundStatement(_updatePolicyDefinition);
+
+            try {
+                _session.execute(boundStatement.bind(data, org, group, policy));
+            } catch (Exception e) {
+                // TODO: Handle exception
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -361,9 +457,26 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
      */
     @Override
     protected void doSetResourceDefinition(String org, String group, String policy, String resource,
-            String definition) {
-        // Exception ???
-        throw new RuntimeException("Unable to find resource '"+resource+"'");
+            String data) {
+        if (doGetResourceDefinition(org, group, MASTER_TAG, policy, resource) == null) {
+            BoundStatement boundStatement = new BoundStatement(_insertResourceDefinition);
+
+            try {
+                _session.execute(boundStatement.bind(org, group, MASTER_TAG, policy, resource, data));
+            } catch (Exception e) {
+                // TODO: Handle exception
+                e.printStackTrace();
+            }
+        } else {
+            BoundStatement boundStatement = new BoundStatement(_updateResourceDefinition);
+
+            try {
+                _session.execute(boundStatement.bind(data, org, group, policy, resource));
+            } catch (Exception e) {
+                // TODO: Handle exception
+                e.printStackTrace();
+            }
+        }
     }
 
     /**

@@ -20,6 +20,7 @@ import io.scepta.design.model.Organization;
 import io.scepta.design.model.Policy;
 import io.scepta.design.model.PolicyGroup;
 import io.scepta.design.server.AbstractDesignServer;
+import io.scepta.design.server.PolicyGroupInterchange;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -121,6 +122,38 @@ public class RESTDesignServer extends AbstractDesignServer {
     }
 
     /**
+     * This method imports a complete policy group.
+     *
+     * @param orgName The organization name
+     * @param group The policy group interchange information
+     * @return The response
+     */
+    @POST
+    @Path("/{orgName}/import")
+    @Consumes("application/json")
+    public Response importPolicyGroup(@PathParam("orgName") String orgName, PolicyGroupInterchange group) {
+        getRepository().importPolicyGroup(orgName, group);
+        return (success());
+    }
+
+    /**
+     * This method determines the CORS header values for accessing an organization import.
+     *
+     * @param servletResponse The servlet response
+     * @return No relevant
+     */
+    @OPTIONS
+    @Path("/{orgName}/import")
+    public Response organizationImportOptions(@Context HttpServletResponse servletResponse) {
+        servletResponse.addHeader("Allow-Control-Allow-Methods","POST,GET,OPTIONS");
+        servletResponse.addHeader("Access-Control-Allow-Credentials","true");
+        servletResponse.addHeader("Access-Control-Allow-Origin","*");
+        servletResponse.addHeader("Access-Control-Allow-Headers","Content-Type,X-Requested-With");
+        servletResponse.addHeader("Access-Control-Max-Age","60");
+        return (null);
+    }
+
+    /**
      * This method returns the policy group associated with the
      * organization name and group name.
      *
@@ -152,7 +185,7 @@ public class RESTDesignServer extends AbstractDesignServer {
     public Response export(@PathParam("orgName") String orgName,
                                     @PathParam("groupName") String groupName,
                                     @QueryParam("tag") String tag) {
-        return (success(exportPolicyGroup(orgName, groupName, tag)));
+        return (success(getRepository().exportPolicyGroup(orgName, groupName, tag)));
     }
 
     /**

@@ -71,6 +71,10 @@ public interface DesignRepository {
      */
     PolicyGroup getPolicyGroup(String org, String group, String tag);
 
+    void importPolicyGroup(String org, PolicyGroupInterchange defn);
+
+    PolicyGroupInterchange exportPolicyGroup(String org, String group, String tag);
+
     /**
      * This method will remove a policy group, and associated policies,
      * endpoints, etc. This task will only remove the current version

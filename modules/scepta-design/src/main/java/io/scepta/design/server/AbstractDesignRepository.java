@@ -19,6 +19,7 @@ package io.scepta.design.server;
 import io.scepta.design.model.Organization;
 import io.scepta.design.model.Policy;
 import io.scepta.design.model.PolicyGroup;
+import io.scepta.design.model.Resource;
 import io.scepta.design.model.Tag;
 
 public abstract class AbstractDesignRepository implements DesignRepository {
@@ -152,6 +153,75 @@ public abstract class AbstractDesignRepository implements DesignRepository {
 
     protected abstract PolicyGroup doGetPolicyGroup(String org, String group, String tag);
 
+    public void importPolicyGroup(String org, PolicyGroupInterchange defn) {
+
+        // TODO: Check permission
+
+        // Check if policy group already exists with the specific organization
+
+        if (getPolicyGroup(org, defn.getGroupDetails().getName(), MASTER_TAG) != null) {
+
+            // TODO: REPORT EXCEPTION
+            throw new RuntimeException("Policy '"+defn.getGroupDetails().getName()
+                    +"' already exists in organization '"+org+"'");
+        }
+
+        addPolicyGroup(org, defn.getGroupDetails());
+
+        for (Policy p : defn.getPolicyDetails()) {
+            addPolicy(org, defn.getGroupDetails().getName(), p);
+
+            String policyDefn=defn.getPolicyDefinitions().get(p.getName());
+
+            if (policyDefn != null) {
+                setPolicyDefinition(org, defn.getGroupDetails().getName(), p.getName(), policyDefn);
+            }
+
+            for (Resource r : p.getResources()) {
+                String resDefn=defn.getResourceDefinitions().get(r.getName());
+
+                if (resDefn != null) {
+                    setResourceDefinition(org, defn.getGroupDetails().getName(),
+                            p.getName(), r.getName(), resDefn);
+                }
+            }
+        }
+    }
+
+    public PolicyGroupInterchange exportPolicyGroup(String org, String group, String tag) {
+        PolicyGroupInterchange defn=new PolicyGroupInterchange()
+            .setGroupDetails(getPolicyGroup(org, group, tag))
+            .setPolicyDetails(getPolicies(org, group, tag));
+
+        // For each policy, we need to export its definition and its resource definitions
+        java.util.Map<String,String> policyDefns=new java.util.HashMap<String,String>();
+        java.util.Map<String,String> resourceDefns=new java.util.HashMap<String,String>();
+
+        for (Policy p : defn.getPolicyDetails()) {
+            policyDefns.put(p.getName(), getPolicyDefinition(org, group, tag, p.getName()));
+
+            for (Resource r : p.getResources()) {
+                String existingResource=resourceDefns.get(r.getName());
+                String currentResource=getResourceDefinition(org, group, tag,
+                                    p.getName(), r.getName());
+                if (existingResource != null) {
+                    // Check if resource content is the same
+                    if (!existingResource.equals(currentResource)) {
+                        // TODO: Deal with exception
+                        throw new RuntimeException("Resource '"+r.getName()
+                                +"' used in multiple policies but with different content");
+                    }
+                } else {
+                    resourceDefns.put(r.getName(), currentResource);
+                }
+            }
+        }
+
+        defn.setPolicyDefinitions(policyDefns).setResourceDefinitions(resourceDefns);
+
+        return (defn);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -196,7 +266,7 @@ public abstract class AbstractDesignRepository implements DesignRepository {
         // TODO: Check permission
 
         // Check if policy does not exists
-        if (getPolicy(org, group, policy.getName(), MASTER_TAG) == null) {
+        if (getPolicy(org, group, MASTER_TAG, policy.getName()) == null) {
             doAddPolicy(org, group, policy);
         } else {
             // TODO: Throw exception?
@@ -254,6 +324,11 @@ public abstract class AbstractDesignRepository implements DesignRepository {
     public void setPolicyDefinition(String org, String group, String policy, String definition) {
 
         // TODO: Check permission
+
+        if (getPolicy(org, group, MASTER_TAG, policy) == null) {
+            // TODO: POLICY NOT FOUND
+            throw new RuntimeException("Policy not found");
+        }
 
         doSetPolicyDefinition(org, group, policy, definition);
     }

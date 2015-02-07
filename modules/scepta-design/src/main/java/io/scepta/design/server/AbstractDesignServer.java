@@ -18,10 +18,7 @@ package io.scepta.design.server;
 
 import java.util.ServiceLoader;
 
-import io.scepta.design.model.Policy;
-import io.scepta.design.model.Resource;
-
-public abstract class AbstractDesignServer implements DesignServer {
+public abstract class AbstractDesignServer {
 
     private DesignRepository _repository;
 
@@ -38,43 +35,4 @@ public abstract class AbstractDesignServer implements DesignServer {
         return (_repository);
     }
 
-    public void importPolicyGroup(String org, ImportExportDefinition defn) {
-
-        // TODO: Check permission
-
-    }
-
-    public ImportExportDefinition exportPolicyGroup(String org, String group, String tag) {
-        ImportExportDefinition defn=new ImportExportDefinition()
-            .setGroupDetails(getRepository().getPolicyGroup(org, group, tag))
-            .setPolicyDetails(getRepository().getPolicies(org, group, tag));
-
-        // For each policy, we need to export its definition and its resource definitions
-        java.util.Map<String,String> policyDefns=new java.util.HashMap<String,String>();
-        java.util.Map<String,String> resourceDefns=new java.util.HashMap<String,String>();
-
-        for (Policy p : defn.getPolicyDetails()) {
-            policyDefns.put(p.getName(), getRepository().getPolicyDefinition(org, group, tag, p.getName()));
-
-            for (Resource r : p.getResources()) {
-                String existingResource=resourceDefns.get(r.getName());
-                String currentResource=getRepository().getResourceDefinition(org, group, tag,
-                                    p.getName(), r.getName());
-                if (existingResource != null) {
-                    // Check if resource content is the same
-                    if (!existingResource.equals(currentResource)) {
-                        // TODO: Deal with exception
-                        throw new RuntimeException("Resource '"+r.getName()
-                                +"' used in multiple policies but with different content");
-                    }
-                } else {
-                    resourceDefns.put(r.getName(), currentResource);
-                }
-            }
-        }
-
-        defn.setPolicyDefinitions(policyDefns).setResourceDefinitions(resourceDefns);
-
-        return (defn);
-    }
 }

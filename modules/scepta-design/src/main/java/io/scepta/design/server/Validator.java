@@ -16,11 +16,20 @@
  */
 package io.scepta.design.server;
 
+/**
+ * This interface represents a component responsible for validating the policy
+ * group.
+ *
+ */
+public interface Validator {
 
-public interface DesignServer {
-
-    void importPolicyGroup(String org, ImportExportDefinition defn);
-
-    ImportExportDefinition exportPolicyGroup(String org, String group, String tag);
+    /**
+     * This method validates the supplied policy group and returns
+     * any issues that were detected.
+     *
+     * @param group The policy group
+     * @return The list of issues detected
+     */
+    java.util.List<Issue> valid(PolicyGroupInterchange group);
 
 }
