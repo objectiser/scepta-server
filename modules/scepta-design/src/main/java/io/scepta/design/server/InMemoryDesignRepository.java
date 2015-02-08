@@ -114,7 +114,7 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected void doAddPolicyGroup(String org, PolicyGroup group) {
+    protected void doAddPolicyGroup(String org, PolicyGroup group, String tag) {
         Organization o=doGetOrganization(org);
 
         if (o != null) {
@@ -137,7 +137,7 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
     @Override
     protected void doUpdatePolicyGroup(String org, PolicyGroup group) {
         doRemovePolicyGroup(org, group.getName());
-        doAddPolicyGroup(org, group);
+        doAddPolicyGroup(org, group, null);
     }
 
     /**
@@ -185,15 +185,6 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected List<Tag> doGetTags(String org, String group) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected Set<Policy> doGetPolicies(String org, String group, String tag) {
         PolicyGroup pg=doGetPolicyGroup(org, group, tag);
 
@@ -208,7 +199,7 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected void doAddPolicy(String org, String group, Policy policy) {
+    protected void doAddPolicy(String org, String group, String tag, Policy policy) {
         PolicyGroup pg=doGetPolicyGroup(org, group, null);
 
         if (pg != null) {
@@ -230,7 +221,7 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
     @Override
     protected void doUpdatePolicy(String org, String group, Policy policy) {
         doRemovePolicy(org, group, policy.getName());
-        doAddPolicy(org, group, policy);
+        doAddPolicy(org, group, null, policy);
     }
 
     /**
@@ -269,7 +260,7 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected void doSetPolicyDefinition(String org, String group, String policy, String definition) {
+    protected void doSetPolicyDefinition(String org, String group, String tag, String policy, String definition) {
         Policy p=doGetPolicy(org, group, null, policy);
 
         if (p != null) {
@@ -305,7 +296,7 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected void doSetResourceDefinition(String org, String group, String policy, String resource,
+    protected void doSetResourceDefinition(String org, String group, String tag, String policy, String resource,
             String definition) {
         Policy p=doGetPolicy(org, group, null, policy);
 
@@ -340,5 +331,23 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
         }
 
         return (null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected List<Tag> doGetTags(String org, String group) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doAddTag(String org, String group, Tag tag) {
+        // TODO Auto-generated method stub
+
     }
 }

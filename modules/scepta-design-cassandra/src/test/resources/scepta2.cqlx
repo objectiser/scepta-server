@@ -63,6 +63,14 @@ create table resourcedefns (
     PRIMARY KEY (organization, group, tag, policy, resource)
 );
 
+create table tags (
+    organization text,
+    group text,
+    tag text,
+    data text,
+    PRIMARY KEY (organization, group, tag)
+);
+
 
 insert into scepta.organizations (organization, data)
     values ('Overlord', '{ "name":"Overlord", "description":"The Overlord organization" }');

@@ -86,8 +86,6 @@ public interface DesignRepository {
      */
     PolicyGroup removePolicyGroup(String org, String group);
 
-    java.util.List<Tag> getTags(String org, String group);
-
     java.util.Set<Policy> getPolicies(String org, String group, String tag);
 
     void addPolicy(String org, String group, Policy policy);
@@ -105,5 +103,20 @@ public interface DesignRepository {
     void setResourceDefinition(String org, String group, String policy, String resource, String definition);
 
     Policy removePolicy(String org, String group, String policy);
+
+    /**
+     * This method tags the policy group, within the named organization,
+     * using the optionally specified tag. If the tag is not supplied,
+     * then one will be created.
+     *
+     * @param org The organization
+     * @param group The policy group
+     * @param tag The optional tag
+     * @param description The description to associate with the tag
+     * @return The tag
+     */
+    Tag createTag(String org, String group, String tag, String description);
+
+    java.util.List<Tag> getTags(String org, String group);
 
 }

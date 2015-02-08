@@ -16,6 +16,8 @@
  */
 package io.scepta.design.server;
 
+import java.text.SimpleDateFormat;
+
 import io.scepta.design.model.Organization;
 import io.scepta.design.model.Policy;
 import io.scepta.design.model.PolicyGroup;
@@ -23,6 +25,8 @@ import io.scepta.design.model.Resource;
 import io.scepta.design.model.Tag;
 
 public abstract class AbstractDesignRepository implements DesignRepository {
+
+    private static final SimpleDateFormat DATE_FORMATTER=new SimpleDateFormat("yyyyMMddHHmmss");
 
     /**
      * {@inheritDoc}
@@ -114,14 +118,14 @@ public abstract class AbstractDesignRepository implements DesignRepository {
 
         // Check if policy group does not exists
         if (getPolicyGroup(org, group.getName(), MASTER_TAG) == null) {
-            doAddPolicyGroup(org, group);
+            doAddPolicyGroup(org, group, MASTER_TAG);
         } else {
             // TODO: Throw exception?
             throw new RuntimeException("Policy group already exists");
         }
     }
 
-    protected abstract void doAddPolicyGroup(String org, PolicyGroup group);
+    protected abstract void doAddPolicyGroup(String org, PolicyGroup group, String tag);
 
     /**
      * {@inheritDoc}
@@ -237,18 +241,6 @@ public abstract class AbstractDesignRepository implements DesignRepository {
     /**
      * {@inheritDoc}
      */
-    public java.util.List<Tag> getTags(String org, String group) {
-
-        // TODO: Check permission
-
-        return (doGetTags(org, group));
-    }
-
-    protected abstract java.util.List<Tag> doGetTags(String org, String group);
-
-    /**
-     * {@inheritDoc}
-     */
     public java.util.Set<Policy> getPolicies(String org, String group, String tag) {
 
         // TODO: Check permission
@@ -267,14 +259,14 @@ public abstract class AbstractDesignRepository implements DesignRepository {
 
         // Check if policy does not exists
         if (getPolicy(org, group, MASTER_TAG, policy.getName()) == null) {
-            doAddPolicy(org, group, policy);
+            doAddPolicy(org, group, MASTER_TAG, policy);
         } else {
             // TODO: Throw exception?
             throw new RuntimeException("Policy already exists");
         }
     }
 
-    protected abstract void doAddPolicy(String org, String group, Policy policy);
+    protected abstract void doAddPolicy(String org, String group, String tag, Policy policy);
 
     /**
      * {@inheritDoc}
@@ -330,10 +322,11 @@ public abstract class AbstractDesignRepository implements DesignRepository {
             throw new RuntimeException("Policy not found");
         }
 
-        doSetPolicyDefinition(org, group, policy, definition);
+        doSetPolicyDefinition(org, group, MASTER_TAG, policy, definition);
     }
 
-    protected abstract void doSetPolicyDefinition(String org, String group, String policy, String definition);
+    protected abstract void doSetPolicyDefinition(String org, String group, String tag,
+                            String policy, String definition);
 
     /**
      * {@inheritDoc}
@@ -355,10 +348,10 @@ public abstract class AbstractDesignRepository implements DesignRepository {
 
         // TODO: Check permission
 
-        doSetResourceDefinition(org, group, policy, resource, definition);
+        doSetResourceDefinition(org, group, MASTER_TAG, policy, resource, definition);
     }
 
-    protected abstract void doSetResourceDefinition(String org, String group, String policy,
+    protected abstract void doSetResourceDefinition(String org, String group, String tag, String policy,
                 String resource, String definition);
 
     /**
@@ -372,5 +365,71 @@ public abstract class AbstractDesignRepository implements DesignRepository {
     }
 
     protected abstract Policy doRemovePolicy(String org, String group, String policy);
+
+    /**
+     * {@inheritDoc}
+     */
+    public Tag createTag(String org, String group, String tagName, String description) {
+        // If tag not specified then create one based on the current date and time
+        if (tagName == null || tagName.trim().length() == 0) {
+            tagName = DATE_FORMATTER.format(new java.util.Date());
+        } else if (tagName == MASTER_TAG) {
+
+            // TODO: EXCEPTION
+            throw new RuntimeException("Cannot tag using 'master'");
+        }
+
+        // Copy 'master' tagged information to specified tag
+        PolicyGroup pg=getPolicyGroup(org, group, MASTER_TAG);
+
+        if (pg != null) {
+            doAddPolicyGroup(org, pg, tagName);
+
+            for (Policy p : getPolicies(org, group, MASTER_TAG)) {
+                doAddPolicy(org, group, tagName, p);
+
+                String pdefn=getPolicyDefinition(org, group, MASTER_TAG, p.getName());
+
+                if (pdefn != null) {
+                    doSetPolicyDefinition(org, group, tagName, p.getName(), pdefn);
+                }
+
+                for (Resource r : p.getResources()) {
+                    String rdefn=getResourceDefinition(org, group, MASTER_TAG, p.getName(), r.getName());
+
+                    if (rdefn != null) {
+                        doSetResourceDefinition(org, group, tagName, p.getName(), r.getName(), rdefn);
+                    }
+                }
+            }
+
+            // Create tag representation
+            Tag tag=new Tag()
+                    .setName(tagName)
+                    .setDescription(description)
+                    .setCreatedTimestamp(System.currentTimeMillis())
+                    .setCreatedBy("UNKNOWN");
+
+            doAddTag(org, group, tag);
+
+            return (tag);
+        } else {
+            throw new RuntimeException("Unable to find policy group");
+        }
+    }
+
+    protected abstract void doAddTag(String org, String group, Tag tag);
+
+    /**
+     * {@inheritDoc}
+     */
+    public java.util.List<Tag> getTags(String org, String group) {
+
+        // TODO: Check permission
+
+        return (doGetTags(org, group));
+    }
+
+    protected abstract java.util.List<Tag> doGetTags(String org, String group);
 
 }

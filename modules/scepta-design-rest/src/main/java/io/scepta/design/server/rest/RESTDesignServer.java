@@ -27,6 +27,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -186,6 +187,42 @@ public class RESTDesignServer extends AbstractDesignServer {
                                     @PathParam("groupName") String groupName,
                                     @QueryParam("tag") String tag) {
         return (success(getRepository().exportPolicyGroup(orgName, groupName, tag)));
+    }
+
+    /**
+     * This method tags the policy group master associated with the
+     * organization, group and optional tag name.
+     *
+     * @param orgName The organization name
+     * @param groupName The policy group name
+     * @param tagName The optional tag name
+     * @param description The description
+     * @return The tag name (if not specified then one will be generated)
+     */
+    @PUT
+    @Path("/{orgName}/group/{groupName}/tag")
+    @Consumes("text/plain")
+    @Produces("application/json")
+    public Response createTag(@PathParam("orgName") String orgName,
+                                    @PathParam("groupName") String groupName,
+                                    @QueryParam("name") String tagName, String description) {
+        return (success(getRepository().createTag(orgName, groupName, tagName, description)));
+    }
+
+    /**
+     * This method lists the tags associated with organization and
+     * policy group..
+     *
+     * @param orgName The organization name
+     * @param groupName The policy group name
+     * @return The list of tags for the organization and group
+     */
+    @GET
+    @Path("/{orgName}/group/{groupName}/tag")
+    @Produces("application/json")
+    public Response showTags(@PathParam("orgName") String orgName,
+                                    @PathParam("groupName") String groupName) {
+        return (success(getRepository().getTags(orgName, groupName)));
     }
 
     /**

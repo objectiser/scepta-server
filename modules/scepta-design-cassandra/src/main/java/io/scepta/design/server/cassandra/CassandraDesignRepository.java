@@ -23,6 +23,8 @@ import io.scepta.design.model.Tag;
 import io.scepta.design.server.AbstractDesignRepository;
 import io.scepta.design.server.DesignRepository;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -48,6 +50,7 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
     private PreparedStatement _insertPolicy;
     private PreparedStatement _insertPolicyDefinition;
     private PreparedStatement _insertResourceDefinition;
+    private PreparedStatement _insertTag;
     private PreparedStatement _updateOrganization;
     private PreparedStatement _updatePolicyGroup;
     private PreparedStatement _updatePolicy;
@@ -94,6 +97,11 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
                 "INSERT INTO scepta.resourcedefns " +
                 "(organization, group, tag, policy, resource, data)" +
                 "VALUES (?,?,?,?,?,?);");
+
+        _insertTag = _session.prepare(
+                "INSERT INTO scepta.tags " +
+                "(organization, group, tag, data)" +
+                "VALUES (?,?,?,?);");
 
         _updateOrganization = _session.prepare(
                 "UPDATE scepta.organizations " +
@@ -244,13 +252,13 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected void doAddPolicyGroup(String org, PolicyGroup group) {
+    protected void doAddPolicyGroup(String org, PolicyGroup group, String tag) {
         BoundStatement boundStatement = new BoundStatement(_insertPolicyGroup);
 
         try {
             String data=MAPPER.writeValueAsString(group);
 
-            _session.execute(boundStatement.bind(org, group.getName(), MASTER_TAG, data));
+            _session.execute(boundStatement.bind(org, group.getName(), tag, data));
         } catch (Exception e) {
             // TODO: Handle exception
             e.printStackTrace();
@@ -308,15 +316,6 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected List<Tag> doGetTags(String org, String group) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected Set<Policy> doGetPolicies(String org, String group, String tag) {
         java.util.Set<Policy> ret=new java.util.HashSet<Policy>();
 
@@ -340,13 +339,13 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected void doAddPolicy(String org, String group, Policy policy) {
+    protected void doAddPolicy(String org, String group, String tag, Policy policy) {
         BoundStatement boundStatement = new BoundStatement(_insertPolicy);
 
         try {
             String data=MAPPER.writeValueAsString(policy);
 
-            _session.execute(boundStatement.bind(org, group, MASTER_TAG, policy.getName(), data));
+            _session.execute(boundStatement.bind(org, group, tag, policy.getName(), data));
         } catch (Exception e) {
             // TODO: Handle exception
             e.printStackTrace();
@@ -413,17 +412,17 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected void doSetPolicyDefinition(String org, String group, String policy, String data) {
-        if (doGetPolicyDefinition(org, group, MASTER_TAG, policy) == null) {
+    protected void doSetPolicyDefinition(String org, String group, String tag, String policy, String data) {
+        if (doGetPolicyDefinition(org, group, tag, policy) == null) {
             BoundStatement boundStatement = new BoundStatement(_insertPolicyDefinition);
 
             try {
-                _session.execute(boundStatement.bind(org, group, MASTER_TAG, policy, data));
+                _session.execute(boundStatement.bind(org, group, tag, policy, data));
             } catch (Exception e) {
                 // TODO: Handle exception
                 e.printStackTrace();
             }
-        } else {
+        } else if (tag == MASTER_TAG) {
             BoundStatement boundStatement = new BoundStatement(_updatePolicyDefinition);
 
             try {
@@ -432,6 +431,9 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
                 // TODO: Handle exception
                 e.printStackTrace();
             }
+        } else {
+            // TODO: REPORT EXCEPTION - should not be able to update tagged definitions
+            throw new RuntimeException("Attempt to update tagged policy definition");
         }
     }
 
@@ -456,18 +458,18 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected void doSetResourceDefinition(String org, String group, String policy, String resource,
+    protected void doSetResourceDefinition(String org, String group, String tag, String policy, String resource,
             String data) {
-        if (doGetResourceDefinition(org, group, MASTER_TAG, policy, resource) == null) {
+        if (doGetResourceDefinition(org, group, tag, policy, resource) == null) {
             BoundStatement boundStatement = new BoundStatement(_insertResourceDefinition);
 
             try {
-                _session.execute(boundStatement.bind(org, group, MASTER_TAG, policy, resource, data));
+                _session.execute(boundStatement.bind(org, group, tag, policy, resource, data));
             } catch (Exception e) {
                 // TODO: Handle exception
                 e.printStackTrace();
             }
-        } else {
+        } else if (tag == MASTER_TAG) {
             BoundStatement boundStatement = new BoundStatement(_updateResourceDefinition);
 
             try {
@@ -476,6 +478,9 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
                 // TODO: Handle exception
                 e.printStackTrace();
             }
+        } else {
+            // TODO: REPORT EXCEPTION - should not be able to update tagged definitions
+            throw new RuntimeException("Attempt to update tagged resource definition");
         }
     }
 
@@ -486,4 +491,54 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
     protected Policy doRemovePolicy(String org, String group, String policy) {
         return (null);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected List<Tag> doGetTags(String org, String group) {
+        java.util.List<Tag> ret=new java.util.ArrayList<Tag>();
+
+        ResultSet results = _session.execute("SELECT data FROM tags WHERE organization='"+org
+                            +"' AND group = '"+group+"'");
+        for (Row row : results) {
+            try {
+                String data=row.getString("data");
+
+                ret.add(MAPPER.readValue(data.getBytes(), Tag.class));
+            } catch (Exception e) {
+                // TODO: HANDLE EXCEPTION
+                e.printStackTrace();
+            }
+        }
+
+        // Sort tags, latest first
+        if (ret.size() > 1) {
+            Collections.sort(ret, new Comparator<Tag>() {
+                public int compare(Tag t1, Tag t2) {
+                    return ((int)(t2.getCreatedTimestamp()-t1.getCreatedTimestamp()));
+                }
+            });
+        }
+
+        return (ret);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doAddTag(String org, String group, Tag tag) {
+        BoundStatement boundStatement = new BoundStatement(_insertTag);
+
+        try {
+            String data=MAPPER.writeValueAsString(tag);
+
+            _session.execute(boundStatement.bind(org, group, tag.getName(), data));
+        } catch (Exception e) {
+            // TODO: Handle exception
+            e.printStackTrace();
+        }
+    }
+
 }

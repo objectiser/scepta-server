@@ -30,7 +30,6 @@ public abstract class AbstractDesignServer {
         if (_repository == null) {
             ServiceLoader<DesignRepository> sl=ServiceLoader.load(DesignRepository.class);
             _repository = sl.iterator().next();
-            System.out.println("REPOSITORY="+_repository);
         }
         return (_repository);
     }
