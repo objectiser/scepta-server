@@ -16,22 +16,15 @@
  */
 package io.scepta.design.server;
 
-import io.scepta.design.model.Issue;
-
-/**
- * This interface represents a component responsible for validating the policy
- * group.
- *
- */
-public interface Validator {
+public interface Generator {
 
     /**
-     * This method validates the supplied policy group and returns
-     * any issues that were detected.
+     * This method generates an executable version of the
+     * supplied policy group.
      *
      * @param group The policy group
-     * @return The list of issues detected
+     * @return The executable representation
      */
-    java.util.List<Issue> valid(PolicyGroupInterchange group);
+    GeneratedResult generate(PolicyGroupInterchange group);
 
 }

@@ -14,24 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.scepta.design.server;
-
-import io.scepta.design.model.Issue;
+package io.scepta.design.generator;
 
 /**
- * This interface represents a component responsible for validating the policy
- * group.
+ * This interface represents a processor associated with an endpoint characteristic.
  *
  */
-public interface Validator {
+public interface CharacteristicProcessor {
 
     /**
-     * This method validates the supplied policy group and returns
-     * any issues that were detected.
+     * The characteristic type associated with the processor.
      *
-     * @param group The policy group
-     * @return The list of issues detected
+     * @return The characteristic type
      */
-    java.util.List<Issue> valid(PolicyGroupInterchange group);
+    String getType();
+
+    /**
+     * This method processes the supplied policy definition based on the
+     * characteristic.
+     *
+     * @param elem The element being processed
+     */
+    void process(org.w3c.dom.Element elem);
 
 }

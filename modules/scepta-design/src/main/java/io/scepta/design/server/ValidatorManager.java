@@ -16,6 +16,8 @@
  */
 package io.scepta.design.server;
 
+import io.scepta.design.model.Issue;
+
 import java.util.ServiceLoader;
 
 // TODO: Review how best to support validation, as we want to be able to

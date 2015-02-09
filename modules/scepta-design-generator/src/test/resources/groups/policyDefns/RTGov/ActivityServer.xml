@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xsi:schemaLocation="
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+  <camelContext xmlns="http://camel.apache.org/schema/spring">
+    <restConfiguration component="servlet" bindingMode="json" contextPath="gov-next-example-activity-rest/rest" port="8080">
+      <dataFormatProperty key="prettyPrint" value="true"/>
+    </restConfiguration>
+    <!-- defines the rest services using the context-path /user -->
+    <rest path="/activities" consumes="application/json" produces="application/json">
+      <description>Activities rest service</description>
+      <put type="org.overlord.rtgov.activity.model.ActivityUnit" >
+        <description>Store activity unit</description>
+        <inOnly uri="scepta:activityunits"/>
+      </put>
+    </rest>
+  </camelContext>
+  <bean id="aggregatorStrategy" class="org.overlord.gov.examples.aggregator.ListAggregator"/>
+</beans>

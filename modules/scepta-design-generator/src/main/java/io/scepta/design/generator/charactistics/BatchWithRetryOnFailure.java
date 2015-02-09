@@ -14,24 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.scepta.design.server;
+package io.scepta.design.generator.charactistics;
 
-import io.scepta.design.model.Issue;
+import org.w3c.dom.Element;
+
+import io.scepta.design.generator.CharacteristicProcessor;
 
 /**
- * This interface represents a component responsible for validating the policy
- * group.
+ * This class implements the 'BatchWithRetryOnFailure' characteristic.
  *
  */
-public interface Validator {
+public class BatchWithRetryOnFailure implements CharacteristicProcessor {
 
     /**
-     * This method validates the supplied policy group and returns
-     * any issues that were detected.
-     *
-     * @param group The policy group
-     * @return The list of issues detected
+     * {@inheritDoc}
      */
-    java.util.List<Issue> valid(PolicyGroupInterchange group);
+    @Override
+    public String getType() {
+        return getClass().getName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void process(Element elem) {
+        // TODO Auto-generated method stub
+
+    }
 
 }

@@ -16,22 +16,23 @@
  */
 package io.scepta.design.server;
 
-import io.scepta.design.model.Issue;
+import java.util.ServiceLoader;
 
 /**
- * This interface represents a component responsible for validating the policy
- * group.
+ * This class is a factory for the Generator component.
  *
  */
-public interface Validator {
+public class GeneratorFactory {
 
     /**
-     * This method validates the supplied policy group and returns
-     * any issues that were detected.
+     * This method returns a generator.
      *
-     * @param group The policy group
-     * @return The list of issues detected
+     * @return The generator, or null if not found
      */
-    java.util.List<Issue> valid(PolicyGroupInterchange group);
+    public Generator get() {
+        ServiceLoader<Generator> loader=ServiceLoader.load(Generator.class);
+
+        return (loader.iterator().next());
+    }
 
 }

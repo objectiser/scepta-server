@@ -31,7 +31,7 @@ public class Tag {
     private long _createdTimestamp;
     private String _createdBy;
     private BuildStatus _buildStatus;
-    private String _buildReason;
+    private java.util.List<Issue> _buildIssues=new java.util.ArrayList<Issue>();
     private long _buildTimestamp;
 
     public String getName() {
@@ -79,16 +79,16 @@ public class Tag {
         return (this);
     }
 
-    public String getBuildReason() {
-        return (_buildReason);
+    public java.util.List<Issue> getBuildIssues() {
+        return (_buildIssues);
     }
 
-    public Tag setBuildReason(String buildReason) {
-        _buildReason = buildReason;
+    public Tag setBuildIssues(java.util.List<Issue> buildIssues) {
+        _buildIssues = buildIssues;
         return (this);
     }
 
-    public long getBuildTimestamp() {
+    public long getBuildLastUpdate() {
         return (_buildTimestamp);
     }
 

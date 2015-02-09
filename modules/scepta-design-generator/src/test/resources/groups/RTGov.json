@@ -1,0 +1,181 @@
+{
+    "groupDetails": {
+        "description": "Runtime Governance policy group",
+        "endpoints": [
+            {
+                "description": "Activity Units",
+                "actual": "activemq:queue:activityunits",
+                "characteristics": [
+                    {
+                        "type": "Queue",
+                        "properties": {}
+                    },
+                    {
+                        "type": "BatchWithRetryOnFailure",
+                        "properties": {
+                            "batchSize": "500",
+                            "batchInterval": "1000",
+                            "maxRetry": "3"
+                        }
+                    }
+                ],
+                "consumerOptions": {
+                    "maxConcurrentConsumers": "30"
+                },
+                "producerOptions": {},
+                "dependencies": [
+                    {
+                        "groupId": "org.overlord.rtgov.activity-management",
+                        "artifactId": "activity",
+                        "version": "2.1.0.Beta1"
+                    }
+                ],
+                "name": "activityunits"
+            },
+            {
+                "description": "Reported Situations",
+                "actual": "activemq:queue:situations",
+                "characteristics": [
+                    {
+                        "type": "Queue",
+                        "properties": {}
+                    },
+                    {
+                        "type": "BatchWithRetryOnFailure",
+                        "properties": {
+                            "batchSize": "500",
+                            "batchInterval": "1000",
+                            "maxRetry": "3"
+                        }
+                    }
+                ],
+                "consumerOptions": {
+                    "maxConcurrentConsumers": "30"
+                },
+                "producerOptions": {},
+                "dependencies": [
+                    {
+                        "groupId": "org.overlord.rtgov.activity-analysis",
+                        "artifactId": "analytics",
+                        "version": "2.1.0.Beta1"
+                    }
+                ],
+                "name": "situations"
+            },
+            {
+                "description": "Response time information",
+                "actual": "activemq:queue:responsetimes",
+                "characteristics": [
+                    {
+                        "type": "Queue",
+                        "properties": {}
+                    },
+                    {
+                        "type": "BatchWithRetryOnFailure",
+                        "properties": {
+                            "batchSize": "500",
+                            "batchInterval": "1000",
+                            "maxRetry": "3"
+                        }
+                    }
+                ],
+                "consumerOptions": {
+                    "maxConcurrentConsumers": "30"
+                },
+                "producerOptions": {},
+                "dependencies": [
+                    {
+                        "groupId": "org.overlord.rtgov.activity-analysis",
+                        "artifactId": "analytics",
+                        "version": "2.1.0.Beta1"
+                    }
+                ],
+                "name": "responsetimes"
+            },
+            {
+                "description": "Service Definitions derived from the Activity Units",
+                "actual": "activemq:queue:servicedefns",
+                "characteristics": [
+                    {
+                        "type": "Queue",
+                        "properties": {}
+                    },
+                    {
+                        "type": "BatchWithRetryOnFailure",
+                        "properties": {
+                            "batchSize": "500",
+                            "batchInterval": "1000",
+                            "maxRetry": "3"
+                        }
+                    }
+                ],
+                "consumerOptions": {
+                    "maxConcurrentConsumers": "30"
+                },
+                "producerOptions": {},
+                "dependencies": [
+                    {
+                        "groupId": "org.overlord.rtgov.activity-analysis",
+                        "artifactId": "analytics",
+                        "version": "2.1.0.Beta1"
+                    }
+                ],
+                "name": "servicedefns"
+            }
+        ],
+        "name": "RTGov"
+    },
+    "policyDetails": [
+        {
+            "description": "Convert service definitions into response time information.",
+            "dependencies": [
+                {
+                    "groupId": "org.overlord.rtgov.examples",
+                    "artifactId": "responsetimeprocessor",
+                    "version": "something"
+                }
+            ],
+            "name": "ResponseTime",
+            "resources": []
+        },
+        {
+            "description": "Activity server for reporting activities related to runtime governance",
+            "dependencies": [],
+            "name": "ActivityServer",
+            "resources": []
+        },
+        {
+            "description": "Convert activity units into a description of the activity that occurred within a service.",
+            "dependencies": [],
+            "name": "SLA",
+            "resources": [
+                {
+                    "description": "Script that checks for SLA violations and creates a Situation when one is detected",
+                    "dependencies": [],
+                    "name": "SLAViolation.mvel"
+                }
+            ]
+        },
+        {
+            "description": "Convert activity units into a description of the activity that occurred within a service.",
+            "dependencies": [
+                {
+                    "groupId": "org.overlord.rtgov.examples",
+                    "artifactId": "servicedefnprocessor",
+                    "version": "something"
+                }
+            ],
+            "name": "ServiceDefinition",
+            "resources": []
+        }
+    ],
+    "policyDefinitions": {
+        "ActivityServer": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<bean xmlns=\"http://www.springframework.org/schema/beans\"\n  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n  xmlns:camel=\"http://camel.apache.org/schema/spring\"\n  xsi:schemaLocation=\"\n            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd\n            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd\">\n\n  <camelContext xmlns=\"http://camel.apache.org/schema/spring\">\n    <restConfiguration component=\"servlet\" bindingMode=\"json\" contextPath=\"gov-next-example-activity-rest/rest\" port=\"8080\">\n      <dataFormatProperty key=\"prettyPrint\" value=\"true\"/>\n    </restConfiguration>\n\n    <!-- defines the rest services using the context-path /user -->\n    <rest path=\"/activities\" consumes=\"application/json\" produces=\"application/json\">\n      <description>Activities rest service</description>\n\n      <put type=\"org.overlord.rtgov.activity.model.ActivityUnit\" >\n        <description>Store activity unit</description>\n        <inOnly uri=\"scepta:activityunits\"/>\n      </put>\n    </rest>\n\n  </camelContext>\n\n  <bean id=\"aggregatorStrategy\" class=\"org.overlord.gov.examples.aggregator.ListAggregator\"/>\n\n</beans>\n",
+        "SLA": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<beans xmlns=\"http://www.springframework.org/schema/beans\"\n       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n       xmlns:camel=\"http://camel.apache.org/schema/spring\"\n       xsi:schemaLocation=\"\n         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd\n         http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd\">\n\n  <camelContext xmlns=\"http://camel.apache.org/schema/spring\">\n    <route id=\"sla\">\n      <from uri=\"scepta:responsetimes\"/>\n      <to uri=\"mvel:SLAViolation.mvel\"/>\n      <inOnly uri=\"scepta:situations\" />\n    </route>\n  </camelContext>\n</beans>",
+        "ResponseTime": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<beans xmlns=\"http://www.springframework.org/schema/beans\"\n       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n       xmlns:camel=\"http://camel.apache.org/schema/spring\"\n       xsi:schemaLocation=\"\n         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd\n         http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd\">\n\n  <camelContext xmlns=\"http://camel.apache.org/schema/spring\">\n    <route id=\"responsetime\">\n      <from uri=\"activemq:queue:servicedefns?maxConcurrentConsumers=30\"/>\n      <to uri=\"responseTimeProcessor\"/>\n      <inOnly uri=\"activemq:queue:responsetimes\" />\n    </route>\n  </camelContext>\n\n  <bean id=\"responseTimeProcessor\" class=\"org.overlord.gov.examples.processor.ResponseTimeProcessor\"/>\n\n</beans>",
+        "ServiceDefinition": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<beans xmlns=\"http://www.springframework.org/schema/beans\"\n       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n       xmlns:camel=\"http://camel.apache.org/schema/spring\"\n       xsi:schemaLocation=\"\n         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd\n         http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd\">\n\n  <camelContext xmlns=\"http://camel.apache.org/schema/spring\">\n    <route id=\"servicedefn\">\n      <from uri=\"scepta:activityunits\"/>\n      <to uri=\"serviceDefinitionProcessor\"/>\n      <inOnly uri=\"scepta:servicedefns\" />\n    </route>\n  </camelContext>\n\n  <bean id=\"serviceDefinitionProcessor\" class=\"org.overlord.gov.examples.processor.ServiceDefinitionProcessor\"/>\n</beans>"
+    },
+    "resourceDefinitions": {
+        "SLAViolation.mvel": "org.overlord.rtgov.analytics.situation.Situation sit=null;\n\nif (body.average > 200) {\n    sit = new org.overlord.rtgov.analytics.situation.Situation();\n\n    sit.setType(\"SLA Violation\");\n    sit.setSubject(org.overlord.rtgov.analytics.situation.Situation.createSubject(body.getServiceType(),\n            body.getOperation(), body.getFault()));\n    sit.setTimestamp(java.lang.System.currentTimeMillis());\n\n    sit.getProperties().putAll(body.getProperties());\n\n    if (body.getRequestId() != null) {\n        sit.getActivityTypeIds().add(body.getRequestId());\n    }\n    if (body.getResponseId() != null) {\n        sit.getActivityTypeIds().add(body.getResponseId());\n    }\n\n    sit.getContext().addAll(body.getContext());\n\n    String serviceName=body.getServiceType();\n\n    if (serviceName.startsWith(\"{\")) {\n        serviceName = javax.xml.namespace.QName.valueOf(serviceName).getLocalPart();\n    }\n\n    sit.setDescription(serviceName+\" exceeded maximum response time of 200 ms\");\n    sit.setSeverity(org.overlord.rtgov.analytics.situation.Situation.Severity.Low);\n}\n\nreturn sit;"
+    }
+}

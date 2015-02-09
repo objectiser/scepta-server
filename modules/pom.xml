@@ -34,6 +34,7 @@
   <modules>
     <module>scepta-design</module>
     <module>scepta-design-cassandra</module>
+    <module>scepta-design-generator</module>
     <module>scepta-design-rest</module>
   </modules>
 </project>

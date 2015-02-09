@@ -423,7 +423,6 @@ public abstract class AbstractDesignRepository implements DesignRepository {
                     .setCreatedTimestamp(System.currentTimeMillis())
                     .setCreatedBy("UNKNOWN")
                     .setBuildStatus(BuildStatus.Created)
-                    .setBuildReason("")
                     .setBuildTimestamp(System.currentTimeMillis());
 
             doAddTag(org, group, tag);
