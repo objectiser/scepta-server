@@ -24,6 +24,7 @@ import io.scepta.design.server.PolicyGroupInterchange;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
@@ -223,6 +224,41 @@ public class RESTDesignServer extends AbstractDesignServer {
     public Response showTags(@PathParam("orgName") String orgName,
                                     @PathParam("groupName") String groupName) {
         return (success(getRepository().getTags(orgName, groupName)));
+    }
+
+    /**
+     * This method returns the tag associated with organization,
+     * policy group and tag name.
+     *
+     * @param orgName The organization name
+     * @param groupName The policy group name
+     * @param tagName The tag name
+     * @return The list of tags for the organization and group
+     */
+    @GET
+    @Path("/{orgName}/group/{groupName}/tag/{tagName}")
+    @Produces("application/json")
+    public Response showTag(@PathParam("orgName") String orgName,
+                                    @PathParam("groupName") String groupName,
+                                    @PathParam("tagName") String tagName) {
+        return (success(getRepository().getTag(orgName, groupName, tagName)));
+    }
+
+    /**
+     * This method removes the specified tag.
+     *
+     * @param orgName The organization name
+     * @param groupName The policy group name
+     * @param tagName The tag name
+     * @return Whether successful
+     */
+    @DELETE
+    @Path("/{orgName}/group/{groupName}/tag/{tagName}")
+    public Response removeTag(@PathParam("orgName") String orgName,
+                                    @PathParam("groupName") String groupName,
+                                    @PathParam("tagName") String tagName) {
+        getRepository().removeTag(orgName, groupName, tagName);
+        return (success());
     }
 
     /**

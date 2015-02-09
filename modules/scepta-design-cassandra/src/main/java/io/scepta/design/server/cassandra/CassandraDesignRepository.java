@@ -56,6 +56,16 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
     private PreparedStatement _updatePolicy;
     private PreparedStatement _updatePolicyDefinition;
     private PreparedStatement _updateResourceDefinition;
+    private PreparedStatement _removeOrganization;
+    private PreparedStatement _removePolicyGroup;
+    private PreparedStatement _removePolicy;
+    private PreparedStatement _removePoliciesForTag;
+    private PreparedStatement _removePolicyDefinition;
+    private PreparedStatement _removePolicyDefinitionsForTag;
+    private PreparedStatement _removeResourceDefinition;
+    private PreparedStatement _removeResourceDefinitionsForPolicy;
+    private PreparedStatement _removeResourceDefinitionsForTag;
+    private PreparedStatement _removeTag;
 
     /**
      * The default constructor.
@@ -139,6 +149,66 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
                 "tag = '"+DesignRepository.MASTER_TAG+"' AND " +
                 "policy = ? AND " +
                 "resource = ?;");
+
+        _removeOrganization = _session.prepare(
+                "DELETE FROM scepta.organizations " +
+                "WHERE organization = ?;");
+
+        _removePolicyGroup = _session.prepare(
+                "DELETE FROM scepta.policygroups " +
+                "WHERE organization = ? AND " +
+                "group = ? AND " +
+                "tag = ?;");
+
+        _removePolicy = _session.prepare(
+                "DELETE FROM scepta.policies " +
+                "WHERE organization = ? AND " +
+                "group = ? AND " +
+                "tag = '"+DesignRepository.MASTER_TAG+"' AND " +
+                "policy = ?;");
+        _removePoliciesForTag = _session.prepare(
+                "DELETE FROM scepta.policies " +
+                "WHERE organization = ? AND " +
+                "group = ? AND " +
+                "tag = ?;");
+
+        _removePolicyDefinition = _session.prepare(
+                "DELETE FROM scepta.policydefns " +
+                "WHERE organization = ? AND " +
+                "group = ? AND " +
+                "tag = '"+DesignRepository.MASTER_TAG+"' AND " +
+                "policy = ?;");
+        _removePolicyDefinitionsForTag = _session.prepare(
+                "DELETE FROM scepta.policydefns " +
+                "WHERE organization = ? AND " +
+                "group = ? AND " +
+                "tag = ?;");
+
+        _removeResourceDefinition = _session.prepare(
+                "DELETE FROM scepta.resourcedefns " +
+                "WHERE organization = ? AND " +
+                "group = ? AND " +
+                "tag = '"+DesignRepository.MASTER_TAG+"' AND " +
+                "policy = ? AND " +
+                "resource = ?;");
+        _removeResourceDefinitionsForPolicy = _session.prepare(
+                "DELETE FROM scepta.resourcedefns " +
+                "WHERE organization = ? AND " +
+                "group = ? AND " +
+                "tag = '"+DesignRepository.MASTER_TAG+"' AND " +
+                "policy = ?;");
+        _removeResourceDefinitionsForTag = _session.prepare(
+                "DELETE FROM scepta.resourcedefns " +
+                "WHERE organization = ? AND " +
+                "group = ? AND " +
+                "tag = ?;");
+
+        _removeTag = _session.prepare(
+                "DELETE FROM scepta.tags " +
+                "WHERE organization = ? AND " +
+                "group = ? AND " +
+                "tag = ?;");
+
     }
 
     /**
@@ -222,8 +292,13 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected Organization doRemoveOrganization(String name) {
-        return (null);
+    protected void doRemoveOrganization(String name) {
+        try {
+            _session.execute(new BoundStatement(_removeOrganization).bind(name));
+        } catch (Exception e) {
+            // TODO: Handle exception
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -308,8 +383,16 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected PolicyGroup doRemovePolicyGroup(String org, String group) {
-        return (null);
+    protected void doRemovePolicyGroup(String org, String group) {
+        try {
+            for (Policy p : doGetPolicies(org, group, MASTER_TAG)) {
+                doRemovePolicy(org, group, p.getName());
+            }
+            _session.execute(new BoundStatement(_removePolicyGroup).bind(org, group));
+        } catch (Exception e) {
+            // TODO: Handle exception
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -390,6 +473,21 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
         }
 
         return (null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doRemovePolicy(String org, String group, String policy) {
+        try {
+            _session.execute(new BoundStatement(_removePolicy).bind(org, group, policy));
+            _session.execute(new BoundStatement(_removePolicyDefinition).bind(org, group, policy));
+            _session.execute(new BoundStatement(_removeResourceDefinitionsForPolicy).bind(org, group, policy));
+        } catch (Exception e) {
+            // TODO: Handle exception
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -488,8 +586,13 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected Policy doRemovePolicy(String org, String group, String policy) {
-        return (null);
+    protected void doRemoveResourceDefinition(String org, String group, String policy, String resource) {
+        try {
+            _session.execute(new BoundStatement(_removeResourceDefinition).bind(org, group, policy, resource));
+        } catch (Exception e) {
+            // TODO: Handle exception
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -528,6 +631,28 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
+    protected Tag doGetTag(String org, String group, String tag) {
+        Row row=_session.execute("SELECT data FROM tags WHERE organization = '"+org
+                +"' AND group = '"+group+"' AND tag = '"+tag+"'").one();
+
+        if (row != null) {
+            try {
+                String data=row.getString("data");
+
+                return (MAPPER.readValue(data.getBytes(), Tag.class));
+            } catch (Exception e) {
+                // TODO: HANDLE EXCEPTION
+                e.printStackTrace();
+            }
+        }
+
+        return (null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void doAddTag(String org, String group, Tag tag) {
         BoundStatement boundStatement = new BoundStatement(_insertTag);
 
@@ -535,6 +660,23 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
             String data=MAPPER.writeValueAsString(tag);
 
             _session.execute(boundStatement.bind(org, group, tag.getName(), data));
+        } catch (Exception e) {
+            // TODO: Handle exception
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doRemoveTag(String org, String group, String tag) {
+        try {
+            _session.execute(new BoundStatement(_removePolicyGroup).bind(org, group, tag));
+            _session.execute(new BoundStatement(_removePoliciesForTag).bind(org, group, tag));
+            _session.execute(new BoundStatement(_removePolicyDefinitionsForTag).bind(org, group, tag));
+            _session.execute(new BoundStatement(_removeResourceDefinitionsForTag).bind(org, group, tag));
+            _session.execute(new BoundStatement(_removeTag).bind(org, group, tag));
         } catch (Exception e) {
             // TODO: Handle exception
             e.printStackTrace();

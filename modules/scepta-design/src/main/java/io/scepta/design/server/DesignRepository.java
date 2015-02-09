@@ -48,7 +48,7 @@ public interface DesignRepository {
 
     Organization getOrganization(String name);
 
-    Organization removeOrganization(String name);
+    void removeOrganization(String name);
 
     java.util.Set<PolicyGroup> getPolicyGroups(String org);
 
@@ -82,9 +82,8 @@ public interface DesignRepository {
      *
      * @param org The organization
      * @param group The policy group name
-     * @return The removed policy group, or null if not found
      */
-    PolicyGroup removePolicyGroup(String org, String group);
+    void removePolicyGroup(String org, String group);
 
     java.util.Set<Policy> getPolicies(String org, String group, String tag);
 
@@ -102,7 +101,7 @@ public interface DesignRepository {
 
     void setResourceDefinition(String org, String group, String policy, String resource, String definition);
 
-    Policy removePolicy(String org, String group, String policy);
+    void removePolicy(String org, String group, String policy);
 
     /**
      * This method tags the policy group, within the named organization,
@@ -118,5 +117,9 @@ public interface DesignRepository {
     Tag createTag(String org, String group, String tag, String description);
 
     java.util.List<Tag> getTags(String org, String group);
+
+    Tag getTag(String org, String group, String tag);
+
+    void removeTag(String org, String group, String tag);
 
 }

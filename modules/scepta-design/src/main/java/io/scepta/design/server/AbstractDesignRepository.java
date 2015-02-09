@@ -23,6 +23,7 @@ import io.scepta.design.model.Policy;
 import io.scepta.design.model.PolicyGroup;
 import io.scepta.design.model.Resource;
 import io.scepta.design.model.Tag;
+import io.scepta.design.model.Tag.BuildStatus;
 
 public abstract class AbstractDesignRepository implements DesignRepository {
 
@@ -88,14 +89,14 @@ public abstract class AbstractDesignRepository implements DesignRepository {
     /**
      * {@inheritDoc}
      */
-    public Organization removeOrganization(String name) {
+    public void removeOrganization(String name) {
 
         // Check current user has access to the organization
 
-        return (doRemoveOrganization(name));
+        doRemoveOrganization(name);
     }
 
-    protected abstract Organization doRemoveOrganization(String name);
+    protected abstract void doRemoveOrganization(String name);
 
     /**
      * {@inheritDoc}
@@ -229,14 +230,14 @@ public abstract class AbstractDesignRepository implements DesignRepository {
     /**
      * {@inheritDoc}
      */
-    public PolicyGroup removePolicyGroup(String org, String group) {
+    public void removePolicyGroup(String org, String group) {
 
         // TODO: Check permission
 
-        return (doRemovePolicyGroup(org, group));
+        doRemovePolicyGroup(org, group);
     }
 
-    protected abstract PolicyGroup doRemovePolicyGroup(String org, String group);
+    protected abstract void doRemovePolicyGroup(String org, String group);
 
     /**
      * {@inheritDoc}
@@ -301,6 +302,18 @@ public abstract class AbstractDesignRepository implements DesignRepository {
     /**
      * {@inheritDoc}
      */
+    public void removePolicy(String org, String group, String policy) {
+
+        // TODO: Check permitted to remove the policy
+
+        doRemovePolicy(org, group, policy);
+    }
+
+    protected abstract void doRemovePolicy(String org, String group, String policy);
+
+    /**
+     * {@inheritDoc}
+     */
     public String getPolicyDefinition(String org, String group, String tag, String policy) {
 
         // TODO: Check permission
@@ -357,14 +370,14 @@ public abstract class AbstractDesignRepository implements DesignRepository {
     /**
      * {@inheritDoc}
      */
-    public Policy removePolicy(String org, String group, String policy) {
+    public void removeResourceDefinition(String org, String group, String policy, String resource) {
 
-        // TODO: Check permitted to remove the policy
+        // TODO: Check permitted to remove the resource definition
 
-        return (doRemovePolicy(org, group, policy));
+        doRemoveResourceDefinition(org, group, policy, resource);
     }
 
-    protected abstract Policy doRemovePolicy(String org, String group, String policy);
+    protected abstract void doRemoveResourceDefinition(String org, String group, String policy, String resource);
 
     /**
      * {@inheritDoc}
@@ -408,7 +421,10 @@ public abstract class AbstractDesignRepository implements DesignRepository {
                     .setName(tagName)
                     .setDescription(description)
                     .setCreatedTimestamp(System.currentTimeMillis())
-                    .setCreatedBy("UNKNOWN");
+                    .setCreatedBy("UNKNOWN")
+                    .setBuildStatus(BuildStatus.Created)
+                    .setBuildReason("")
+                    .setBuildTimestamp(System.currentTimeMillis());
 
             doAddTag(org, group, tag);
 
@@ -431,5 +447,29 @@ public abstract class AbstractDesignRepository implements DesignRepository {
     }
 
     protected abstract java.util.List<Tag> doGetTags(String org, String group);
+
+    /**
+     * {@inheritDoc}
+     */
+    public Tag getTag(String org, String group, String tag) {
+
+        // TODO: Check permission
+
+        return (doGetTag(org, group, tag));
+    }
+
+    protected abstract Tag doGetTag(String org, String group, String tag);
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeTag(String org, String group, String tag) {
+
+        // TODO: Check permission
+
+        doRemoveTag(org, group, tag);
+    }
+
+    protected abstract void doRemoveTag(String org, String group, String tag);
 
 }

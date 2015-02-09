@@ -86,14 +86,18 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected Organization doRemoveOrganization(String name) {
+    protected void doRemoveOrganization(String name) {
+        boolean removed=false;
+
         for (Organization org : _organizations) {
-            if (org.getName().equals(name)
-                     && _organizations.remove(org)) {
-                return (org);
+            if (org.getName().equals(name)) {
+                removed = _organizations.remove(org);
             }
         }
-        return (null);
+
+        if (!removed) {
+            // TODO: EXCEPTION?
+        }
     }
 
     /**
@@ -164,21 +168,24 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected PolicyGroup doRemovePolicyGroup(String org, String group) {
+    protected void doRemovePolicyGroup(String org, String group) {
+        boolean removed=false;
+
         Organization o=doGetOrganization(org);
 
         // TODO: Currently doesn't deal with tags
 
         if (o != null && _groups.containsKey(o)) {
             for (PolicyGroup pg : _groups.get(o)) {
-                if (pg.getName().equals(group)
-                        && _groups.remove(pg) != null) {
-                    return (pg);
+                if (pg.getName().equals(group)) {
+                    removed = (_groups.remove(pg) != null);
                 }
             }
         }
 
-        return (null);
+        if (!removed) {
+            // TODO: EXCEPTION?
+        }
     }
 
     /**
@@ -240,6 +247,28 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
         }
 
         return (null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doRemovePolicy(String org, String group, String policy) {
+        boolean removed=false;
+
+        PolicyGroup pg=doGetPolicyGroup(org, group, null);
+
+        if (pg != null && _policies.containsKey(pg)) {
+            for (Policy pol : _policies.get(pg)) {
+                if (pol.getName().equals(policy)) {
+                    removed = (_policies.remove(pol) != null);
+                }
+            }
+        }
+
+        if (!removed) {
+            // TODO: EXCEPTION?
+        }
     }
 
     /**
@@ -318,19 +347,24 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected Policy doRemovePolicy(String org, String group, String policy) {
-        PolicyGroup pg=doGetPolicyGroup(org, group, null);
+    protected void doRemoveResourceDefinition(String org, String group, String policy, String resource) {
+        boolean removed=false;
 
-        if (pg != null && _policies.containsKey(pg)) {
-            for (Policy pol : _policies.get(pg)) {
-                if (pol.getName().equals(policy)
-                        && _policies.remove(pol) != null) {
-                    return (pol);
+        Policy p=doGetPolicy(org, group, null, policy);
+
+        if (p != null) {
+            // Retrieve resource
+            for (Resource r : p.getResources()) {
+                if (r.getName().equals(resource)) {
+                    _resourceDefn.remove(r);
+                    return;
                 }
             }
         }
 
-        return (null);
+        if (!removed) {
+            // TODO: EXCEPTION?
+        }
     }
 
     /**
@@ -340,6 +374,23 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
     protected List<Tag> doGetTags(String org, String group) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Tag doGetTag(String org, String group, String tag) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doRemoveTag(String org, String group, String tag) {
+        // TODO Auto-generated method stub
     }
 
     /**

@@ -18,10 +18,21 @@ package io.scepta.design.model;
 
 public class Tag {
 
+    public enum BuildStatus {
+        Created,
+        Scheduled,
+        Building,
+        Failed,
+        Successful
+    }
+
     private String _name;
     private String _description;
     private long _createdTimestamp;
     private String _createdBy;
+    private BuildStatus _buildStatus;
+    private String _buildReason;
+    private long _buildTimestamp;
 
     public String getName() {
         return (_name);
@@ -58,5 +69,33 @@ public class Tag {
         _createdBy = creator;
         return (this);
     }
+
+    public BuildStatus getBuildStatus() {
+        return (_buildStatus);
+    }
+
+    public Tag setBuildStatus(BuildStatus buildStatus) {
+        _buildStatus = buildStatus;
+        return (this);
+    }
+
+    public String getBuildReason() {
+        return (_buildReason);
+    }
+
+    public Tag setBuildReason(String buildReason) {
+        _buildReason = buildReason;
+        return (this);
+    }
+
+    public long getBuildTimestamp() {
+        return (_buildTimestamp);
+    }
+
+    public Tag setBuildTimestamp(long timestamp) {
+        _buildTimestamp = timestamp;
+        return (this);
+    }
+
 }
 
