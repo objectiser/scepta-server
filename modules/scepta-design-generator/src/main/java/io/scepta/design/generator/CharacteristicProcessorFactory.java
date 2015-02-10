@@ -18,26 +18,31 @@ package io.scepta.design.generator;
 
 import io.scepta.design.model.Characteristic;
 
+import java.util.ServiceLoader;
+
 /**
- * This interface represents a processor associated with an endpoint characteristic.
+ * This class managers the set of characteristic processors.
  *
  */
-public interface CharacteristicProcessor {
+public class CharacteristicProcessorFactory {
 
     /**
-     * The characteristic type associated with the processor.
-     *
-     * @return The characteristic type
-     */
-    String getType();
-
-    /**
-     * This method processes the supplied policy definition based on the
+     * This method returns a processor associated with the supplied
      * characteristic.
      *
-     * @param characteristic The characteristic
-     * @param elem The element being processed
+     * @param characteristic The characteristic to be processed
+     * @return The characteristic processor, or null if not found
      */
-    void process(Characteristic characteristic, org.w3c.dom.Element elem);
+    public static CharacteristicProcessor get(Characteristic characteristic) {
+        ServiceLoader<CharacteristicProcessor> processors=ServiceLoader.load(CharacteristicProcessor.class);
+
+        for (CharacteristicProcessor cp : processors) {
+            if (cp.getType().equals(characteristic.getType())) {
+                return (cp);
+            }
+        }
+
+        return (null);
+    }
 
 }

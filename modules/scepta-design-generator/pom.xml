@@ -54,21 +54,5 @@
     </dependency>
   </dependencies>
 
-<!--
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>com.mycila</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <configuration>
-        -->
-          <!-- Until find way to avoid having license in example xml files -->
-        <!--
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
--->
 </project>
 

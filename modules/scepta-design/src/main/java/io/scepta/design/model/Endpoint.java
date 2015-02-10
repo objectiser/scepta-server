@@ -21,7 +21,7 @@ public class Endpoint {
     private String _name;
     private String _uri;
     private String _description;
-    private java.util.Set<Characteristic> _characteristics=new java.util.HashSet<Characteristic>();
+    private java.util.List<Characteristic> _characteristics=new java.util.ArrayList<Characteristic>();
     private java.util.Set<Dependency> _dependencies=new java.util.HashSet<Dependency>();
     private java.util.Map<String, String> _consumerOptions=new java.util.HashMap<String, String>();
     private java.util.Map<String, String> _producerOptions=new java.util.HashMap<String, String>();
@@ -53,11 +53,11 @@ public class Endpoint {
         return (this);
     }
 
-    public java.util.Set<Characteristic> getCharacteristics() {
+    public java.util.List<Characteristic> getCharacteristics() {
         return (_characteristics);
     }
 
-    public Endpoint setCharacteristics(java.util.Set<Characteristic> characteristics) {
+    public Endpoint setCharacteristics(java.util.List<Characteristic> characteristics) {
         _characteristics = characteristics;
         return (this);
     }

@@ -38,9 +38,20 @@ public class DOMUtil {
      * @throws Exception Failed to convert
      */
     public static org.w3c.dom.Document textToDoc(String text) throws Exception {
-        org.w3c.dom.Document ret=null;
-
         java.io.InputStream is=new java.io.ByteArrayInputStream(text.getBytes());
+
+        return (textToDoc(is));
+    }
+
+    /**
+     * This method converts the supplied text into a DOM representation.
+     *
+     * @param is The input stream
+     * @return The DOM representation
+     * @throws Exception Failed to convert
+     */
+    public static org.w3c.dom.Document textToDoc(java.io.InputStream is) throws Exception {
+        org.w3c.dom.Document ret=null;
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();

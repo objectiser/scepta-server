@@ -21,6 +21,7 @@ import java.util.Collections;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import io.scepta.design.model.Characteristic;
 import io.scepta.design.model.Endpoint;
 import io.scepta.design.model.Policy;
 import io.scepta.design.model.PolicyGroup;
@@ -153,13 +154,33 @@ public class DefaultGenerator implements Generator {
                                 throws Exception {
         String uri=elem.getAttribute("uri");
 
-        if (uri != null && uri.startsWith(SCEPTA_PREFIX)) {
+        String endpointName=getEndpointName(uri);
+
+        if (endpointName != null) {
             String newuri=processEndpointURI(group, elem.getNodeName(), uri);
 
             if (newuri != null) {
                 elem.setAttribute("uri", newuri);
 
-                // TODO: Apply characteristics
+                // Lookup endpoint
+                Endpoint endpoint=group.getEndpoint(endpointName);
+
+                if (endpoint == null) {
+                    // TODO: ERROR
+                    throw new Exception("Unable to find endpoint '"+endpointName+"'");
+                }
+
+                // Apply characteristics to the policy definition endpoint
+                for (Characteristic characteristic : endpoint.getCharacteristics()) {
+                    CharacteristicProcessor cp=CharacteristicProcessorFactory.get(characteristic);
+
+                    if (cp == null) {
+                        // TODO: ERROR?
+
+                    } else {
+                        cp.process(characteristic, elem);
+                    }
+                }
 
                 return (true);
             }

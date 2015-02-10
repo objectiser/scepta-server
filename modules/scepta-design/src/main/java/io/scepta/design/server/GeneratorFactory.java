@@ -29,7 +29,7 @@ public class GeneratorFactory {
      *
      * @return The generator, or null if not found
      */
-    public Generator get() {
+    public static Generator get() {
         ServiceLoader<Generator> loader=ServiceLoader.load(Generator.class);
 
         return (loader.iterator().next());

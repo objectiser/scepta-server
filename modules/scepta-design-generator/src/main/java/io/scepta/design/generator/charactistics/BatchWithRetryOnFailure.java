@@ -21,12 +21,33 @@ import org.w3c.dom.Text;
 
 import io.scepta.design.generator.CharacteristicProcessor;
 import io.scepta.design.model.Characteristic;
+import io.scepta.design.util.DOMUtil;
 
 /**
  * This class implements the 'BatchWithRetryOnFailure' characteristic.
  *
  */
 public class BatchWithRetryOnFailure implements CharacteristicProcessor {
+
+    private static final org.w3c.dom.Element CONSUMER_PRODUCER_TEMPLATE;
+
+    static {
+        org.w3c.dom.Document doc=null;
+
+        try {
+            doc = DOMUtil.textToDoc(BatchWithRetryOnFailure.class.getResourceAsStream(
+                    "/templates/BatchWithRetryOnFailure-consumer-producer.xml"));
+        } catch (Exception e) {
+            // TODO: ERROR
+            e.printStackTrace();
+        }
+
+        if (doc != null) {
+            CONSUMER_PRODUCER_TEMPLATE = doc.getDocumentElement();
+        } else {
+            CONSUMER_PRODUCER_TEMPLATE = null;
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -53,54 +74,6 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
 
     protected void processConsumer(Characteristic charactistic, Element elem) {
 
-        /*
-         *
-      <route id="servicedefn">
-          <from uri="activemq:queue:activityunits?maxConcurrentConsumers=30"/>
-          <bean ref="retrySupport" method="init" />
-          <log message="Received from ActivityUnits Queue: retry=${header.retryCount} content=${body}"/>
-          <split parallelProcessing="true" strategyRef="aggregatorStrategy" >
-            <simple>${body}</simple>
-            <doTry>
-                <bean ref="retrySupport" method="saveContent" />
-                <!-- THIS IS WHERE THE PROCESSING SHOULD GO -->
-                <doCatch>
-                  <exception>java.lang.Throwable</exception>
-                  <filter>
-                    <simple>${header.retryCount} &lt; 3</simple>
-                    <bean ref="retrySupport" method="addToRetryList" />
-                  </filter>
-                  <setBody><simple>${null}</simple></setBody>
-                </doCatch>
-            </doTry>
-          </split>
-
-          <multicast>
-            <pipeline>
-                <filter>
-                  <simple>${header.retryList.size} &gt; 0</simple>
-                  <setBody><simple>${header.retryList}</simple></setBody>
-                  <setHeader headerName="retryList">
-                    <simple></simple>
-                  </setHeader>
-                  <inOnly uri="activemq:queue:activityunits"/>
-                </filter>
-            </pipeline>
-            <pipeline>
-                <filter>
-                  <simple>${body.size} &gt; 0</simple>
-                  <setHeader headerName="retryList">
-                    <simple></simple>
-                  </setHeader>
-                  <setHeader headerName="retryCount">
-                    <simple>0</simple>
-                  </setHeader>
-                  <inOnly uri="activemq:queue:servicedefns" />
-                </filter>
-            </pipeline>
-          </multicast>
-      </route>
-         */
     }
 
     protected void processProducer(Characteristic charactistic, Element elem) {
