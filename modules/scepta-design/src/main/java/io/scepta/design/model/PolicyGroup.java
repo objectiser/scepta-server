@@ -48,4 +48,20 @@ public class PolicyGroup {
         _endpoints = endpoints;
         return (this);
     }
+
+    /**
+     * This method returns the endpoint associated with the
+     * supplied name.
+     *
+     * @param name The endpoint name
+     * @return The endpoint, or null if not found
+     */
+    public Endpoint getEndpoint(String name) {
+        for (Endpoint endpoint : _endpoints) {
+            if (endpoint.getName().equals(name)) {
+                return (endpoint);
+            }
+        }
+        return (null);
+    }
 }

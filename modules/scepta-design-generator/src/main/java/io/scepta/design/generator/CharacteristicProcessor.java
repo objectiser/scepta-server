@@ -16,6 +16,8 @@
  */
 package io.scepta.design.generator;
 
+import io.scepta.design.model.Characteristic;
+
 /**
  * This interface represents a processor associated with an endpoint characteristic.
  *
@@ -33,8 +35,9 @@ public interface CharacteristicProcessor {
      * This method processes the supplied policy definition based on the
      * characteristic.
      *
+     * @param characteristic The characteristic
      * @param elem The element being processed
      */
-    void process(org.w3c.dom.Element elem);
+    void process(Characteristic charactistic, org.w3c.dom.Element elem);
 
 }

@@ -19,7 +19,7 @@ package io.scepta.design.model;
 public class Endpoint {
 
     private String _name;
-    private String _actual;
+    private String _uri;
     private String _description;
     private java.util.Set<Characteristic> _characteristics=new java.util.HashSet<Characteristic>();
     private java.util.Set<Dependency> _dependencies=new java.util.HashSet<Dependency>();
@@ -35,12 +35,12 @@ public class Endpoint {
         return (this);
     }
 
-    public String getActual() {
-        return (_actual);
+    public String getURI() {
+        return (_uri);
     }
 
-    public Endpoint setActual(String name) {
-        _actual = name;
+    public Endpoint setURI(String uri) {
+        _uri = uri;
         return (this);
     }
 

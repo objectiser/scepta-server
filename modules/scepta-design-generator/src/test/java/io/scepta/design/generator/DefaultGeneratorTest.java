@@ -17,7 +17,9 @@
 package io.scepta.design.generator;
 
 import static org.junit.Assert.*;
-import io.scepta.design.model.Policy;
+
+import io.scepta.design.model.Endpoint;
+import io.scepta.design.model.PolicyGroup;
 import io.scepta.design.server.PolicyGroupInterchange;
 
 import org.junit.Test;
@@ -26,27 +28,124 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DefaultGeneratorTest {
 
+    private static final String TO_ELEMENT = "to";
+    private static final String FROM_ELEMENT = "from";
+    private static final String ACTIVEMQ_QUEUE_TEST = "activemq:queue:test";
+    private static final String TEST_ENDPOINT = "test";
     private static final ObjectMapper MAPPER=new ObjectMapper();
 
     @Test
-    @org.junit.Ignore
-    public void testGeneratePolicyDefinitionRTGov() {
-        DefaultGenerator generator=new DefaultGenerator();
+    public void testGetEndpointName() {
+        assertEquals(DefaultGenerator.getEndpointName("scepta:test"), TEST_ENDPOINT);
+        assertEquals(DefaultGenerator.getEndpointName("scepta:test?op1=val1"), TEST_ENDPOINT);
+        assertNull(DefaultGenerator.getEndpointName("jms:test"));
+    }
 
-        PolicyGroupInterchange group=getPolicyGroup("RTGov");
+    @Test
+    public void testProcessEndpointURIConsumer() {
+        String uri=DefaultGenerator.SCEPTA_PREFIX+TEST_ENDPOINT;
 
-        for (Policy policy : group.getPolicyDetails()) {
-            String updated=generator.generatePolicyDefinition(group, policy);
+        PolicyGroup group=new PolicyGroup();
 
-            String pdefn=getPolicyDefinition(group.getGroupDetails().getName(), policy.getName());
+        Endpoint endpoint=new Endpoint()
+                .setName(TEST_ENDPOINT)
+                .setURI(ACTIVEMQ_QUEUE_TEST);
 
-            if (!updated.equals(pdefn)) {
-                fail("Updated polcy definition ["+group.getGroupDetails().getName()+","+policy.getName()+"] mismatch");
-            }
+        endpoint.getConsumerOptions().put("op1", "val1");
+        endpoint.getConsumerOptions().put("op2", "val2");
+
+        group.getEndpoints().add(endpoint);
+
+        try {
+            String newuri=DefaultGenerator.processEndpointURI(group, FROM_ELEMENT, uri);
+
+            assertNotNull(newuri);
+
+            assertEquals(ACTIVEMQ_QUEUE_TEST+"?op1=val1&op2=val2", newuri);
+        } catch (Exception e) {
+            fail("Failed to process endpoint uri: "+e);
         }
     }
 
-    protected PolicyGroupInterchange getPolicyGroup(String name) {
+    @Test
+    public void testProcessEndpointURIConsumerWithExistingOptions() {
+        String uri=DefaultGenerator.SCEPTA_PREFIX+TEST_ENDPOINT;
+
+        PolicyGroup group=new PolicyGroup();
+
+        Endpoint endpoint=new Endpoint()
+                .setName(TEST_ENDPOINT)
+                .setURI(ACTIVEMQ_QUEUE_TEST+"?existing=value");
+
+        endpoint.getConsumerOptions().put("op1", "val1");
+        endpoint.getConsumerOptions().put("op2", "val2");
+
+        group.getEndpoints().add(endpoint);
+
+        try {
+            String newuri=DefaultGenerator.processEndpointURI(group, FROM_ELEMENT, uri);
+
+            assertNotNull(newuri);
+
+            assertEquals(ACTIVEMQ_QUEUE_TEST+"?existing=value&op1=val1&op2=val2", newuri);
+        } catch (Exception e) {
+            fail("Failed to process endpoint uri: "+e);
+        }
+    }
+
+    @Test
+    public void testProcessEndpointURIProducer() {
+        String uri=DefaultGenerator.SCEPTA_PREFIX+TEST_ENDPOINT;
+
+        PolicyGroup group=new PolicyGroup();
+
+        Endpoint endpoint=new Endpoint()
+                .setName(TEST_ENDPOINT)
+                .setURI(ACTIVEMQ_QUEUE_TEST);
+
+        endpoint.getProducerOptions().put("op1", "val1");
+        endpoint.getProducerOptions().put("op2", "val2");
+
+        group.getEndpoints().add(endpoint);
+
+        try {
+            String newuri=DefaultGenerator.processEndpointURI(group, TO_ELEMENT, uri);
+
+            assertNotNull(newuri);
+
+            assertEquals(ACTIVEMQ_QUEUE_TEST+"?op1=val1&op2=val2", newuri);
+        } catch (Exception e) {
+            fail("Failed to process endpoint uri: "+e);
+        }
+    }
+
+    @Test
+    public void testProcessEndpointURIProducerWithExistingOptions() {
+        String uri=DefaultGenerator.SCEPTA_PREFIX+TEST_ENDPOINT;
+
+        PolicyGroup group=new PolicyGroup();
+
+        Endpoint endpoint=new Endpoint()
+                .setName(TEST_ENDPOINT)
+                .setURI(ACTIVEMQ_QUEUE_TEST+"?existing=value");
+
+        endpoint.getProducerOptions().put("op1", "val1");
+        endpoint.getProducerOptions().put("op2", "val2");
+
+        group.getEndpoints().add(endpoint);
+
+        try {
+            String newuri=DefaultGenerator.processEndpointURI(group, TO_ELEMENT, uri);
+
+            assertNotNull(newuri);
+
+            assertEquals(ACTIVEMQ_QUEUE_TEST+"?existing=value&op1=val1&op2=val2", newuri);
+        } catch (Exception e) {
+            fail("Failed to process endpoint uri: "+e);
+        }
+    }
+
+    protected PolicyGroupInterchange getPolicyGroupInterchange(String name) {
         PolicyGroupInterchange ret=null;
 
         try {
@@ -64,30 +163,6 @@ public class DefaultGeneratorTest {
 
         } catch (Exception e) {
             fail("Failed to load policy group '"+name+"'"+e);
-        }
-
-        return (ret);
-    }
-
-    protected String getPolicyDefinition(String group, String policy) {
-        String ret=null;
-
-        try {
-            java.io.InputStream is=DefaultGeneratorTest.class.getResourceAsStream("/groups/policyDefns/"
-                            +group+"/"+policy+".xml");
-
-            if (is != null) {
-                byte[] b=new byte[is.available()];
-
-                is.read(b);
-
-                is.close();
-
-                ret = new String(b);
-            }
-
-        } catch (Exception e) {
-            fail("Failed to load policy definition for group="+group+" and policy="+policy+" : "+e);
         }
 
         return (ret);

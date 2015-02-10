@@ -1,0 +1,51 @@
+{
+    "groupDetails": {
+        "description": "Runtime Governance policy group",
+        "endpoints": [
+            {
+                "description": "Activity Units",
+                "uri": "activemq:queue:activityunits",
+                "characteristics": [
+                    {
+                        "type": "Queue",
+                        "properties": {}
+                    },
+                    {
+                        "type": "BatchWithRetryOnFailure",
+                        "properties": {
+                            "batchSize": "500",
+                            "batchInterval": "1000",
+                            "maxRetry": "3"
+                        }
+                    }
+                ],
+                "consumerOptions": {
+                    "maxConcurrentConsumers": "30"
+                },
+                "producerOptions": {},
+                "dependencies": [
+                    {
+                        "groupId": "org.overlord.rtgov.activity-management",
+                        "artifactId": "activity",
+                        "version": "2.1.0.Beta1"
+                    }
+                ],
+                "name": "activityunits"
+            }
+        ],
+        "name": "RESTProducer"
+    },
+    "policyDetails": [
+        {
+            "description": "Activity server for reporting activities related to runtime governance",
+            "dependencies": [],
+            "name": "ActivityServer",
+            "resources": []
+        }
+    ],
+    "policyDefinitions": {
+        "ActivityServer": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<beans xmlns=\"http://www.springframework.org/schema/beans\"\n  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n  xmlns:camel=\"http://camel.apache.org/schema/spring\"\n  xsi:schemaLocation=\"\n            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd\n            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd\">\n\n  <camelContext xmlns=\"http://camel.apache.org/schema/spring\">\n    <restConfiguration component=\"servlet\" bindingMode=\"json\" contextPath=\"gov-next-example-activity-rest/rest\" port=\"8080\">\n      <dataFormatProperty key=\"prettyPrint\" value=\"true\"/>\n    </restConfiguration>\n\n    <!-- defines the rest services using the context-path /user -->\n    <rest path=\"/activities\" consumes=\"application/json\" produces=\"application/json\">\n      <description>Activities rest service</description>\n\n      <put type=\"org.overlord.rtgov.activity.model.ActivityUnit\" >\n        <description>Store activity unit</description>\n        <inOnly uri=\"scepta:activityunits\"/>\n      </put>\n    </rest>\n\n  </camelContext>\n\n  <bean id=\"aggregatorStrategy\" class=\"org.overlord.gov.examples.aggregator.ListAggregator\"/>\n\n</beans>\n"
+    },
+    "resourceDefinitions": {
+    }
+}
