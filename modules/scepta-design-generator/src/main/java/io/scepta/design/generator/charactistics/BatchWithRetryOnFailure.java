@@ -17,11 +17,15 @@
 package io.scepta.design.generator.charactistics;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
 import io.scepta.design.generator.CharacteristicProcessor;
 import io.scepta.design.model.Characteristic;
+import io.scepta.design.model.Endpoint;
+import io.scepta.design.model.PolicyGroup;
 import io.scepta.design.util.DOMUtil;
+import io.scepta.design.util.PolicyDefinitionUtil;
 
 /**
  * This class implements the 'BatchWithRetryOnFailure' characteristic.
@@ -30,22 +34,32 @@ import io.scepta.design.util.DOMUtil;
 public class BatchWithRetryOnFailure implements CharacteristicProcessor {
 
     private static final org.w3c.dom.Element CONSUMER_PRODUCER_TEMPLATE;
+    private static final org.w3c.dom.Element CONSUMER_ONLY_TEMPLATE;
 
     static {
-        org.w3c.dom.Document doc=null;
+        org.w3c.dom.Document cpdoc=null;
+        org.w3c.dom.Document codoc=null;
 
         try {
-            doc = DOMUtil.textToDoc(BatchWithRetryOnFailure.class.getResourceAsStream(
+            cpdoc = DOMUtil.textToDoc(BatchWithRetryOnFailure.class.getResourceAsStream(
                     "/templates/BatchWithRetryOnFailure-consumer-producer.xml"));
+            codoc = DOMUtil.textToDoc(BatchWithRetryOnFailure.class.getResourceAsStream(
+                    "/templates/BatchWithRetryOnFailure-consumer-only.xml"));
         } catch (Exception e) {
             // TODO: ERROR
             e.printStackTrace();
         }
 
-        if (doc != null) {
-            CONSUMER_PRODUCER_TEMPLATE = doc.getDocumentElement();
+        if (cpdoc != null) {
+            CONSUMER_PRODUCER_TEMPLATE = cpdoc.getDocumentElement();
         } else {
             CONSUMER_PRODUCER_TEMPLATE = null;
+        }
+
+        if (codoc != null) {
+            CONSUMER_ONLY_TEMPLATE = codoc.getDocumentElement();
+        } else {
+            CONSUMER_ONLY_TEMPLATE = null;
         }
     }
 
@@ -61,22 +75,91 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
      * {@inheritDoc}
      */
     @Override
-    public void process(Characteristic charactistic, Element elem) {
+    public void process(PolicyGroup group, Endpoint endpoint,
+                        Characteristic characteristic, Element elem) {
 
-        if (elem.getNodeName().equals("to") || elem.getNodeName().equals("inOnly")) {
-            processProducer(charactistic, elem);
-        } else if (elem.getNodeName().equals("from")) {
-            processConsumer(charactistic, elem);
+        if (PolicyDefinitionUtil.isProducer(elem.getNodeName())) {
+            processProducer(group, endpoint, characteristic, elem);
+        } else if (PolicyDefinitionUtil.isConsumer(elem.getNodeName())) {
+            processConsumer(group, endpoint, characteristic, elem);
         } else {
             // TODO: Decide whether this should be an exception??
         }
     }
 
-    protected void processConsumer(Characteristic charactistic, Element elem) {
+    protected void processConsumer(PolicyGroup group, Endpoint endpoint,
+                    Characteristic characteristic, Element elem) {
 
+        // Check if element is first action in top level route
+        if (elem.getParentNode() == null
+                || elem.getParentNode().getParentNode() == null
+                || !elem.getParentNode().getNodeName().equals("route")
+                || !elem.getParentNode().getParentNode().getNodeName().equals("camelContext")) {
+            return;
+        }
+
+        // Extract final send actions, if using this same characteristic
+        Element nextActions=elem.getOwnerDocument().createElement("nextActions");
+        Element containedNodes=elem.getOwnerDocument().createElement("containedActions");
+        boolean f_findProducers=true;
+
+        org.w3c.dom.NodeList nl=elem.getParentNode().getChildNodes();
+
+        for (int i=nl.getLength()-1; i >= 0; i--) {
+            // Check if action is a producer
+            Node n=nl.item(i);
+
+            if (n == elem) {
+                break;
+            }
+
+            if (n instanceof Element) {
+
+                if (f_findProducers) {
+                    f_findProducers = PolicyDefinitionUtil.isProducer(n.getNodeName());
+                }
+
+                if (f_findProducers) {
+                    // Check if producer is an endpoint
+                    String uri=((Element)n).getAttribute("uri");
+                    String endpointName=PolicyDefinitionUtil.getEndpointName(uri);
+
+                    if (endpointName != null) {
+                        Endpoint ep=group.getEndpoint(endpointName);
+
+                        if (ep != null
+                                && ep.hasCharacteristic(BatchWithRetryOnFailure.class.getName())) {
+                            DOMUtil.insertFirst(nextActions, n);
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            DOMUtil.insertFirst(containedNodes, n);
+        }
+
+        // Apply template
+        Element template=(Element)elem.getOwnerDocument().importNode(
+                (nextActions.getChildNodes().getLength() > 0 ? CONSUMER_PRODUCER_TEMPLATE :
+                    CONSUMER_ONLY_TEMPLATE), true);
+
+        // Append template nodes after the current element
+        Element parent=(Element)elem.getParentNode();
+
+        while (template.hasChildNodes()) {
+            parent.appendChild(template.getFirstChild());
+        }
+
+        DOMUtil.replaceNodes((Element)parent.getElementsByTagName("ACTIONS").item(0), containedNodes);
+
+        if (nextActions.getChildNodes().getLength() > 0) {
+            DOMUtil.replaceNodes((Element)parent.getElementsByTagName("NEXT").item(0), nextActions);
+        }
     }
 
-    protected void processProducer(Characteristic charactistic, Element elem) {
+   protected void processProducer(PolicyGroup group, Endpoint endpoint,
+                            Characteristic characteristic, Element elem) {
 
         /* 1) Need to add aggregatorStrategy bean at top level if not already defined
          * 2) Need to replace the completionSize and completionInterval info with the options
@@ -104,8 +187,8 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
         route.appendChild(aggregate);
 
         aggregate.setAttribute("strategyRef", "aggregateStrategy");
-        aggregate.setAttribute("completionSize", charactistic.getProperties().get("completionSize"));
-        aggregate.setAttribute("completionInterval", charactistic.getProperties().get("completionInterval"));
+        aggregate.setAttribute("completionSize", characteristic.getProperties().get("completionSize"));
+        aggregate.setAttribute("completionInterval", characteristic.getProperties().get("completionInterval"));
 
         Element correlationExpression=elem.getOwnerDocument().createElement("correlationExpression");
         aggregate.appendChild(correlationExpression);

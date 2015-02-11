@@ -17,10 +17,10 @@
 package io.scepta.design.generator;
 
 import static org.junit.Assert.*;
-
 import io.scepta.design.model.Endpoint;
 import io.scepta.design.model.PolicyGroup;
 import io.scepta.design.server.PolicyGroupInterchange;
+import io.scepta.design.util.PolicyDefinitionUtil;
 
 import org.junit.Test;
 
@@ -35,15 +35,8 @@ public class DefaultGeneratorTest {
     private static final ObjectMapper MAPPER=new ObjectMapper();
 
     @Test
-    public void testGetEndpointName() {
-        assertEquals(DefaultGenerator.getEndpointName("scepta:test"), TEST_ENDPOINT);
-        assertEquals(DefaultGenerator.getEndpointName("scepta:test?op1=val1"), TEST_ENDPOINT);
-        assertNull(DefaultGenerator.getEndpointName("jms:test"));
-    }
-
-    @Test
     public void testProcessEndpointURIConsumer() {
-        String uri=DefaultGenerator.SCEPTA_PREFIX+TEST_ENDPOINT;
+        String uri=PolicyDefinitionUtil.SCEPTA_PREFIX+TEST_ENDPOINT;
 
         PolicyGroup group=new PolicyGroup();
 
@@ -69,7 +62,7 @@ public class DefaultGeneratorTest {
 
     @Test
     public void testProcessEndpointURIConsumerWithExistingOptions() {
-        String uri=DefaultGenerator.SCEPTA_PREFIX+TEST_ENDPOINT;
+        String uri=PolicyDefinitionUtil.SCEPTA_PREFIX+TEST_ENDPOINT;
 
         PolicyGroup group=new PolicyGroup();
 
@@ -95,7 +88,7 @@ public class DefaultGeneratorTest {
 
     @Test
     public void testProcessEndpointURIProducer() {
-        String uri=DefaultGenerator.SCEPTA_PREFIX+TEST_ENDPOINT;
+        String uri=PolicyDefinitionUtil.SCEPTA_PREFIX+TEST_ENDPOINT;
 
         PolicyGroup group=new PolicyGroup();
 
@@ -121,7 +114,7 @@ public class DefaultGeneratorTest {
 
     @Test
     public void testProcessEndpointURIProducerWithExistingOptions() {
-        String uri=DefaultGenerator.SCEPTA_PREFIX+TEST_ENDPOINT;
+        String uri=PolicyDefinitionUtil.SCEPTA_PREFIX+TEST_ENDPOINT;
 
         PolicyGroup group=new PolicyGroup();
 

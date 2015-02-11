@@ -24,6 +24,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 /**
  * This class provides DOM utility functions.
  *
@@ -91,4 +94,36 @@ public class DOMUtil {
         return (ret);
     }
 
+    /**
+     * This method replaces the reference element with the child nodes
+     * of the other element.
+     *
+     * @param ref The reference element
+     * @param newNodes The element containing the new nodes
+     */
+    public static void replaceNodes(Element ref, Element newNodes) {
+        Element parent=(Element)ref.getParentNode();
+
+        while (newNodes.hasChildNodes()) {
+            parent.insertBefore(newNodes.getFirstChild(), ref);
+        }
+
+        // Remove referenced node
+        parent.removeChild(ref);
+    }
+
+    /**
+     * This method adds the supplied node as the first element within
+     * the container.
+     *
+     * @param container The container
+     * @param node The node
+     */
+    public static void insertFirst(Element container, Node node) {
+        if (container.getFirstChild() == null) {
+            container.appendChild(node);
+        } else {
+            container.insertBefore(node, container.getFirstChild());
+        }
+    }
 }

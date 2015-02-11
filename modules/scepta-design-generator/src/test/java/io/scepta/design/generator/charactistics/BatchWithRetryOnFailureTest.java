@@ -18,6 +18,8 @@ package io.scepta.design.generator.charactistics;
 
 import static org.junit.Assert.*;
 import io.scepta.design.model.Characteristic;
+import io.scepta.design.model.Endpoint;
+import io.scepta.design.model.PolicyGroup;
 import io.scepta.design.util.DOMUtil;
 
 import org.junit.Test;
@@ -25,14 +27,16 @@ import org.junit.Test;
 public class BatchWithRetryOnFailureTest {
 
     @Test
-    public void testRESTServiceSendingBatch() {
+    public void testRESTServiceProducerBatchRetry() {
         org.w3c.dom.Document doc=loadDocument("/policyDefns/unprocessed/ActivityServer.xml");
 
         org.w3c.dom.Element elem=(org.w3c.dom.Element)doc.getElementsByTagName("inOnly").item(0);
 
-        System.out.println("ELEM="+elem);
-
         BatchWithRetryOnFailure processor=new BatchWithRetryOnFailure();
+
+        PolicyGroup group=new PolicyGroup();
+
+        Endpoint endpoint=new Endpoint();
 
         Characteristic ch=new Characteristic();
 
@@ -40,10 +44,43 @@ public class BatchWithRetryOnFailureTest {
         ch.getProperties().put("completionSize", "111");
         ch.getProperties().put("completionInterval", "2222");
 
-        processor.process(ch, elem);
+        processor.process(group, endpoint, ch, elem);
 
         try {
             compare(doc, "/policyDefns/processed/ActivityServer.xml");
+        } catch (Exception e) {
+            fail("Failed: "+e);
+        }
+    }
+
+    @Test
+    @org.junit.Ignore
+    public void testRESTServiceConsumerProducerBatchRetry() {
+        org.w3c.dom.Document doc=loadDocument("/policyDefns/unprocessed/ServiceDefinition.xml");
+
+        org.w3c.dom.Element elem=(org.w3c.dom.Element)doc.getElementsByTagName("from").item(0);
+
+        BatchWithRetryOnFailure processor=new BatchWithRetryOnFailure();
+
+        PolicyGroup group=new PolicyGroup();
+
+        Endpoint ep1=new Endpoint().setName("servicedefns");
+        group.getEndpoints().add(ep1);
+
+        Characteristic ch1=new Characteristic()
+                .setType(BatchWithRetryOnFailure.class.getName());
+        //ep1.getCharacteristics().add(ch1);
+
+        Endpoint ep2=new Endpoint();
+        Characteristic ch2=new Characteristic()
+                .setType(BatchWithRetryOnFailure.class.getName());
+        //ch.getProperties().put("completionSize", "111");
+        //ch.getProperties().put("completionInterval", "2222");
+
+        processor.process(group, ep2, ch2, elem);
+
+        try {
+            compare(doc, "/policyDefns/processed/ServiceDefinition.xml");
         } catch (Exception e) {
             fail("Failed: "+e);
         }

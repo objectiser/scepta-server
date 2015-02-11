@@ -62,6 +62,15 @@ public class Endpoint {
         return (this);
     }
 
+    public boolean hasCharacteristic(String type) {
+        for (Characteristic c : _characteristics) {
+            if (c.getType().equals(type)) {
+                return (true);
+            }
+        }
+        return (false);
+    }
+
     public java.util.Set<Dependency> getDependencies() {
         return (_dependencies);
     }

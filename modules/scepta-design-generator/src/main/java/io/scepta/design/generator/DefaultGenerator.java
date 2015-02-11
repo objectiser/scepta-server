@@ -29,14 +29,13 @@ import io.scepta.design.server.GeneratedResult;
 import io.scepta.design.server.Generator;
 import io.scepta.design.server.PolicyGroupInterchange;
 import io.scepta.design.util.DOMUtil;
+import io.scepta.design.util.PolicyDefinitionUtil;
 
 /**
  * This class represents the default implementation of the Generator.
  *
  */
 public class DefaultGenerator implements Generator {
-
-    public static final String SCEPTA_PREFIX = "scepta:";
 
     @Override
     public GeneratedResult generate(PolicyGroupInterchange group) {
@@ -154,7 +153,7 @@ public class DefaultGenerator implements Generator {
                                 throws Exception {
         String uri=elem.getAttribute("uri");
 
-        String endpointName=getEndpointName(uri);
+        String endpointName=PolicyDefinitionUtil.getEndpointName(uri);
 
         if (endpointName != null) {
             String newuri=processEndpointURI(group, elem.getNodeName(), uri);
@@ -178,7 +177,7 @@ public class DefaultGenerator implements Generator {
                         // TODO: ERROR?
 
                     } else {
-                        cp.process(characteristic, elem);
+                        cp.process(group, endpoint, characteristic, elem);
                     }
                 }
 
@@ -187,28 +186,6 @@ public class DefaultGenerator implements Generator {
         }
 
         return (false);
-    }
-
-    /**
-     * This method returns the endpoint name related to
-     * a supplied logical URI.
-     *
-     * @param uri The logical URI
-     * @return The endpoint name, or null if not found
-     */
-    protected static String getEndpointName(String uri) {
-        String endpointName=null;
-
-        if (uri != null && uri.startsWith(SCEPTA_PREFIX)) {
-            endpointName = uri.substring(SCEPTA_PREFIX.length());
-
-            int pos=endpointName.indexOf('?');
-            if (pos != -1) {
-                endpointName = endpointName.substring(0, pos);
-            }
-        }
-
-        return (endpointName);
     }
 
     /**
@@ -225,7 +202,7 @@ public class DefaultGenerator implements Generator {
                                 throws Exception {
         String newuri=null;
 
-        String endpointName=getEndpointName(uri);
+        String endpointName=PolicyDefinitionUtil.getEndpointName(uri);
 
         if (endpointName != null) {
 
@@ -241,7 +218,7 @@ public class DefaultGenerator implements Generator {
 
             boolean firstOption=(newuri.indexOf('?') == -1);
 
-            if (isConsumer(elemName)) {
+            if (PolicyDefinitionUtil.isConsumer(elemName)) {
 
                 // Sort the option keys to make the end result reproducible
                 java.util.List<String> list=
@@ -256,7 +233,7 @@ public class DefaultGenerator implements Generator {
                     firstOption = false;
                 }
 
-            } else if (isProducer(elemName)) {
+            } else if (PolicyDefinitionUtil.isProducer(elemName)) {
 
                 // Sort the option keys to make the end result reproducible
                 java.util.List<String> list=
@@ -283,25 +260,4 @@ public class DefaultGenerator implements Generator {
         return (newuri);
     }
 
-    /**
-     * This method determines whether the supplied element name represents
-     * a consumer.
-     *
-     * @param elemName The element name
-     * @return Whether the element is a consumer
-     */
-    protected static final boolean isConsumer(String elemName) {
-        return (elemName.equals("from"));
-    }
-
-    /**
-     * This method determines whether the supplied element name represents
-     * a producer.
-     *
-     * @param elemName The element name
-     * @return Whether the element is a producer
-     */
-    protected static final boolean isProducer(String elemName) {
-        return (elemName.equals("to") || elemName.equals("inOnly"));
-    }
 }
