@@ -70,4 +70,6 @@
 </route>
   </camelContext>
   <bean class="org.overlord.gov.examples.processor.ServiceDefinitionProcessor" id="serviceDefinitionProcessor"/>
+<bean class="io.scepta.runtime.ListAggregator" id="aggregatorStrategy"/>
+  <bean class="io.scepta.runtime.RetrySupport" id="retrySupport"/>
 </beans>

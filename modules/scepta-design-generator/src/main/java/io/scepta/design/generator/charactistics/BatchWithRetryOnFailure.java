@@ -16,8 +16,10 @@
  */
 package io.scepta.design.generator.charactistics;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import io.scepta.design.generator.CharacteristicProcessor;
@@ -128,7 +130,7 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
                         Endpoint ep=group.getEndpoint(endpointName);
 
                         if (ep != null
-                                && ep.hasCharacteristic(BatchWithRetryOnFailure.class.getName())) {
+                                && ep.hasCharacteristic(BatchWithRetryOnFailure.class.getSimpleName())) {
                             DOMUtil.insertFirst(nextActions, n);
                             continue;
                         }
@@ -142,6 +144,33 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
         applyTemplate(elem, containedNodes, nextActions);
 
         defineRetryAction(elem);
+
+        addBean(elem.getOwnerDocument(), "aggregatorStrategy",
+                io.scepta.runtime.ListAggregator.class.getName());
+        addBean(elem.getOwnerDocument(), "retrySupport",
+                io.scepta.runtime.RetrySupport.class.getName());
+    }
+
+    protected void addBean(Document doc, String id, String clsName) {
+        NodeList nl=doc.getDocumentElement().getElementsByTagName("bean");
+        boolean f_found=false;
+
+        for (int i=0; !f_found && i < nl.getLength(); i++) {
+            String idAttr=((Element)nl.item(i)).getAttribute("id");
+
+            if (idAttr != null && idAttr.equals(id)) {
+                f_found = true;
+            }
+        }
+
+        if (!f_found) {
+            org.w3c.dom.Element bean=doc.createElement("bean");
+
+            bean.setAttribute("id", id);
+            bean.setAttribute("class", clsName);
+
+            doc.getDocumentElement().appendChild(bean);
+        }
     }
 
     protected void defineRetryAction(Element elem) {
@@ -230,6 +259,9 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
         // Add new route inplace of supplied element
         elem.getParentNode().replaceChild(route, elem);
         aggregate.appendChild(elem);
+
+        addBean(elem.getOwnerDocument(), "aggregatorStrategy",
+                io.scepta.runtime.ListAggregator.class.getName());
     }
 
 }

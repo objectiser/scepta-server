@@ -36,6 +36,11 @@
       <groupId>io.scepta</groupId>
       <artifactId>scepta-design</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.scepta</groupId>
+      <artifactId>scepta-runtime</artifactId>
+      <scope>compile</scope>
+    </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>

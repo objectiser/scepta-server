@@ -46,4 +46,5 @@
       </put>
     </rest>
   </camelContext>
+<bean class="io.scepta.runtime.ListAggregator" id="aggregatorStrategy"/>
 </beans>
