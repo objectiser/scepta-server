@@ -113,6 +113,21 @@ public class DOMUtil {
     }
 
     /**
+     * This method replaces the reference element with the new node.
+     *
+     * @param ref The reference element
+     * @param newNode The element
+     */
+    public static void replaceNode(Element ref, Element newNode) {
+        Element parent=(Element)ref.getParentNode();
+
+        parent.insertBefore(newNode, ref);
+
+        // Remove referenced node
+        parent.removeChild(ref);
+    }
+
+    /**
      * This method adds the supplied node as the first element within
      * the container.
      *

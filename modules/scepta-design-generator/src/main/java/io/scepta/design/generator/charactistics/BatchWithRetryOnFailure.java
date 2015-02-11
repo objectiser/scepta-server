@@ -78,7 +78,7 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
     public void process(PolicyGroup group, Endpoint endpoint,
                         Characteristic characteristic, Element elem) {
 
-        if (PolicyDefinitionUtil.isProducer(elem.getNodeName())) {
+        if (PolicyDefinitionUtil.isOnewayProducer(elem.getNodeName())) {
             processProducer(group, endpoint, characteristic, elem);
         } else if (PolicyDefinitionUtil.isConsumer(elem.getNodeName())) {
             processConsumer(group, endpoint, characteristic, elem);
@@ -116,7 +116,7 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
             if (n instanceof Element) {
 
                 if (f_findProducers) {
-                    f_findProducers = PolicyDefinitionUtil.isProducer(n.getNodeName());
+                    f_findProducers = PolicyDefinitionUtil.isOnewayProducer(n.getNodeName());
                 }
 
                 if (f_findProducers) {
@@ -139,6 +139,23 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
             DOMUtil.insertFirst(containedNodes, n);
         }
 
+        applyTemplate(elem, containedNodes, nextActions);
+
+        defineRetryAction(elem);
+    }
+
+    protected void defineRetryAction(Element elem) {
+        Element retryRef=(Element)elem.getOwnerDocument().getElementsByTagName("RETRY").item(0);
+
+        if (retryRef != null) {
+            Element newNode=elem.getOwnerDocument().createElement("inOnly");
+            newNode.setAttribute("uri", elem.getAttribute("uri"));
+
+            DOMUtil.replaceNode(retryRef, newNode);
+        }
+    }
+
+    protected void applyTemplate(Element elem, Element containedNodes, Element nextActions) {
         // Apply template
         Element template=(Element)elem.getOwnerDocument().importNode(
                 (nextActions.getChildNodes().getLength() > 0 ? CONSUMER_PRODUCER_TEMPLATE :

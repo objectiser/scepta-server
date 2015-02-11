@@ -28,7 +28,7 @@ public class BatchWithRetryOnFailureTest {
 
     @Test
     public void testRESTServiceProducerBatchRetry() {
-        org.w3c.dom.Document doc=loadDocument("/policyDefns/unprocessed/ActivityServer.xml");
+        org.w3c.dom.Document doc=loadDocument("/policyDefns/ActivityServer.xml");
 
         org.w3c.dom.Element elem=(org.w3c.dom.Element)doc.getElementsByTagName("inOnly").item(0);
 
@@ -47,16 +47,15 @@ public class BatchWithRetryOnFailureTest {
         processor.process(group, endpoint, ch, elem);
 
         try {
-            compare(doc, "/policyDefns/processed/ActivityServer.xml");
+            compare(doc, "/policyDefns/ActivityServer.xml.result");
         } catch (Exception e) {
             fail("Failed: "+e);
         }
     }
 
     @Test
-    @org.junit.Ignore
     public void testRESTServiceConsumerProducerBatchRetry() {
-        org.w3c.dom.Document doc=loadDocument("/policyDefns/unprocessed/ServiceDefinition.xml");
+        org.w3c.dom.Document doc=loadDocument("/policyDefns/ServiceDefinition.xml");
 
         org.w3c.dom.Element elem=(org.w3c.dom.Element)doc.getElementsByTagName("from").item(0);
 
@@ -69,7 +68,7 @@ public class BatchWithRetryOnFailureTest {
 
         Characteristic ch1=new Characteristic()
                 .setType(BatchWithRetryOnFailure.class.getName());
-        //ep1.getCharacteristics().add(ch1);
+        ep1.getCharacteristics().add(ch1);
 
         Endpoint ep2=new Endpoint();
         Characteristic ch2=new Characteristic()
@@ -80,14 +79,40 @@ public class BatchWithRetryOnFailureTest {
         processor.process(group, ep2, ch2, elem);
 
         try {
-            compare(doc, "/policyDefns/processed/ServiceDefinition.xml");
+            compare(doc, "/policyDefns/ServiceDefinition-consumerproducer.xml.result");
+        } catch (Exception e) {
+            fail("Failed: "+e);
+        }
+    }
+
+    @Test
+    public void testRESTServiceConsumerOnlyBatchRetry() {
+        org.w3c.dom.Document doc=loadDocument("/policyDefns/ServiceDefinition.xml");
+
+        org.w3c.dom.Element elem=(org.w3c.dom.Element)doc.getElementsByTagName("from").item(0);
+
+        BatchWithRetryOnFailure processor=new BatchWithRetryOnFailure();
+
+        PolicyGroup group=new PolicyGroup();
+
+        // Endpoint with no characteristics, so won't be considered a 'next action'
+        Endpoint ep1=new Endpoint().setName("servicedefns");
+        group.getEndpoints().add(ep1);
+
+        Endpoint ep2=new Endpoint();
+        Characteristic ch2=new Characteristic()
+                .setType(BatchWithRetryOnFailure.class.getName());
+
+        processor.process(group, ep2, ch2, elem);
+
+        try {
+            compare(doc, "/policyDefns/ServiceDefinition-consumeronly.xml.result");
         } catch (Exception e) {
             fail("Failed: "+e);
         }
     }
 
     protected void compare(org.w3c.dom.Document doc, String expectedLoc) throws Exception {
-
         String modified=DOMUtil.docToText(doc);
 
         org.w3c.dom.Document expectedDoc=loadDocument(expectedLoc);
@@ -104,6 +129,8 @@ public class BatchWithRetryOnFailureTest {
 
                     System.err.println("MODIFIED: "+modified.substring(startpos, endpos));
                     System.err.println("EXPECTED: "+expected.substring(startpos, endpos));
+
+                    break;
                 }
             }
 

@@ -43,7 +43,18 @@ public class PolicyDefinitionUtil {
      * @return Whether the element is a producer
      */
     public static final boolean isProducer(String elemName) {
-        return (elemName.equals("to") || elemName.equals("inOnly"));
+        return (elemName.equals("to") || isOnewayProducer(elemName));
+    }
+
+    /**
+     * This method determines whether the supplied element name represents
+     * a 'oneway' producer.
+     *
+     * @param elemName The element name
+     * @return Whether the element is a producer
+     */
+    public static final boolean isOnewayProducer(String elemName) {
+        return (elemName.equals("inOnly"));
     }
 
     /**
