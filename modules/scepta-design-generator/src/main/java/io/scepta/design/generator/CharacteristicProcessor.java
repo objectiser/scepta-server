@@ -17,6 +17,7 @@
 package io.scepta.design.generator;
 
 import io.scepta.design.model.Characteristic;
+import io.scepta.design.model.Dependency;
 import io.scepta.design.model.Endpoint;
 import io.scepta.design.model.PolicyGroup;
 
@@ -46,5 +47,12 @@ public interface CharacteristicProcessor {
      */
     void process(PolicyGroup group, Endpoint endpoint,
                 Characteristic characteristic, org.w3c.dom.Element elem);
+
+    /**
+     * This method returns any dependencies that are specific to the chacteristic.
+     *
+     * @return The characteristic's dependency set
+     */
+    java.util.Set<Dependency> getDependencies();
 
 }

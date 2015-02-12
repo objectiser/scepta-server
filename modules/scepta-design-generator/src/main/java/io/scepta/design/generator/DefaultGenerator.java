@@ -21,13 +21,16 @@ import java.util.Collections;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import io.scepta.design.model.Characteristic;
+import io.scepta.design.model.Dependency;
 import io.scepta.design.model.Endpoint;
 import io.scepta.design.model.Policy;
 import io.scepta.design.model.PolicyGroup;
+import io.scepta.design.model.Resource;
 import io.scepta.design.server.GeneratedResult;
 import io.scepta.design.server.Generator;
 import io.scepta.design.server.PolicyGroupInterchange;
@@ -47,23 +50,20 @@ public class DefaultGenerator implements Generator {
         // Process each policy
         for (Policy policy : group.getPolicyDetails()) {
 
+            WebArchive war=ShrinkWrap.create(WebArchive.class,
+                    group.getGroupDetails().getName()+"-"+policy.getName());
+
             // Process the policy definition
-            String policyDefn=generatePolicyDefinition(group.getGroupDetails(),
-                    group.getPolicyDefinitions().get(policy.getName()));
+            generatePolicyDefinition(group.getGroupDetails(), policy,
+                    group.getPolicyDefinitions().get(policy.getName()), war);
 
-            if (policyDefn != null) {
-                try {
-                    WebArchive war=ShrinkWrap.create(WebArchive.class,
-                            group.getGroupDetails().getName()+"-"+policy.getName());
-
-                    war.addAsWebInfResource(new StringAsset(policyDefn), "classes/camel-config.xml");
-
-                    ret.getGenerated().put(policy.getName(), war);
-                } catch (Exception e) {
-                    // TODO: REPORT ERROR
-                    e.printStackTrace();
-                }
+            // Process the resources
+            for (Resource resource : policy.getResources()) {
+                generateResource(group.getGroupDetails(), policy, resource,
+                        group.getResourceDefinitions().get(resource.getName()), war);
             }
+
+            ret.getGenerated().put(policy.getName(), war);
         }
 
         return ret;
@@ -75,10 +75,13 @@ public class DefaultGenerator implements Generator {
      * characteristics.
      *
      * @param group The policy group
+     * @param policy The policy
      * @param policyDefn The policy definition
+     * @param war The optional war archive
      * @return The updated policy definition, or null if failed
      */
-    protected static String generatePolicyDefinition(PolicyGroup group, String policyDefn) {
+    protected static String generatePolicyDefinition(PolicyGroup group, Policy policy,
+                        String policyDefn, WebArchive war) {
         String ret=null;
 
         // Scan for 'from', 'inOnly' and 'to' elements - if 'scepta' prefix, then locate
@@ -101,7 +104,7 @@ public class DefaultGenerator implements Generator {
                     Node node=nl.item(i);
 
                     if (node instanceof Element) {
-                        f_changed = processEndpoint(group, (Element)node);
+                        f_changed = processEndpoint(group, (Element)node, war);
 
                         if (f_changed) {
                             continue;
@@ -119,7 +122,7 @@ public class DefaultGenerator implements Generator {
                     Node node=nl.item(i);
 
                     if (node instanceof Element) {
-                        f_changed = processEndpoint(group, (Element)node);
+                        f_changed = processEndpoint(group, (Element)node, war);
 
                         if (f_changed) {
                             continue;
@@ -137,7 +140,7 @@ public class DefaultGenerator implements Generator {
                     Node node=nl.item(i);
 
                     if (node instanceof Element) {
-                        f_changed = processEndpoint(group, (Element)node);
+                        f_changed = processEndpoint(group, (Element)node, war);
 
                         if (f_changed) {
                             continue;
@@ -148,6 +151,15 @@ public class DefaultGenerator implements Generator {
 
             // Convert back to text
             ret = DOMUtil.docToText(doc);
+
+            if (war != null) {
+                if (ret != null) {
+                    war.addAsWebInfResource(new StringAsset(ret), "classes/camel-config.xml");
+                }
+
+                // Add policy dependencies
+                addDependencies(war, policy.getDependencies());
+            }
 
         } catch (Exception e) {
             // TODO: LOG EXCEPTION
@@ -163,11 +175,12 @@ public class DefaultGenerator implements Generator {
      *
      * @param group The policy group
      * @param elem The DOM element representing the input/output element
+     * @param war The optional war archive
      * @return Whether this element has been modified
      * @throws Exception Failed to process endpoint
      */
-    protected static boolean processEndpoint(PolicyGroup group, Element elem)
-                                throws Exception {
+    protected static boolean processEndpoint(PolicyGroup group, Element elem,
+                            WebArchive war) throws Exception {
         String uri=elem.getAttribute("uri");
 
         String endpointName=PolicyDefinitionUtil.getEndpointName(uri);
@@ -195,7 +208,17 @@ public class DefaultGenerator implements Generator {
 
                     } else {
                         cp.process(group, endpoint, characteristic, elem);
+
+                        // Add dependencies
+                        if (war != null) {
+                            addDependencies(war, cp.getDependencies());
+                        }
                     }
+                }
+
+                // Apply dependencies on endpoint
+                if (war != null) {
+                    addDependencies(war, endpoint.getDependencies());
                 }
 
                 return (true);
@@ -277,4 +300,34 @@ public class DefaultGenerator implements Generator {
         return (newuri);
     }
 
+    /**
+     * This method adds the supplied resource and its dependencies to the war archive.
+     *
+     * @param group The policy group
+     * @param policy The policy
+     * @param resource The resource
+     * @param definition The resource definition
+     * @param war The war archive
+     */
+    protected static void generateResource(PolicyGroup group, Policy policy, Resource resource,
+                                    String definition, WebArchive war) {
+        war.addAsWebInfResource(new StringAsset(definition), "classes/"+resource.getName());
+
+        // Add resource dependencies
+        addDependencies(war, resource.getDependencies());
+    }
+
+    /**
+     * This method adds a set of maven dependencies to the supplied war archive.
+     *
+     * @param war The war achieve
+     * @param dependencies The set of dependencies
+     */
+    protected static void addDependencies(WebArchive war, java.util.Set<Dependency> dependencies) {
+        for (Dependency d : dependencies) {
+            war.addAsLibraries(Maven.resolver().resolve(
+                    d.getGroupId()+":"+d.getArtifactId()+":"+d.getVersion())
+                    .withTransitivity().asFile());
+        }
+    }
 }

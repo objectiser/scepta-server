@@ -16,6 +16,8 @@
  */
 package io.scepta.design.generator.characteristics;
 
+import java.util.Set;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,6 +26,7 @@ import org.w3c.dom.Text;
 
 import io.scepta.design.generator.CharacteristicProcessor;
 import io.scepta.design.model.Characteristic;
+import io.scepta.design.model.Dependency;
 import io.scepta.design.model.Endpoint;
 import io.scepta.design.model.PolicyGroup;
 import io.scepta.design.util.DOMUtil;
@@ -37,6 +40,8 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
 
     private static final org.w3c.dom.Element CONSUMER_PRODUCER_TEMPLATE;
     private static final org.w3c.dom.Element CONSUMER_ONLY_TEMPLATE;
+
+    private static final java.util.Set<Dependency> DEPENDENCIES=new java.util.HashSet<Dependency>();
 
     static {
         org.w3c.dom.Document cpdoc=null;
@@ -63,6 +68,11 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
         } else {
             CONSUMER_ONLY_TEMPLATE = null;
         }
+
+        DEPENDENCIES.add(new Dependency()
+                .setGroupId("io.scepta")
+                .setArtifactId("scepta-runtime")
+                .setVersion("0.1.0-SNAPSHOT"));
     }
 
     /**
@@ -262,6 +272,11 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
 
         addBean(elem.getOwnerDocument(), "aggregatorStrategy",
                 io.scepta.runtime.ListAggregator.class.getName());
+    }
+
+    @Override
+    public Set<Dependency> getDependencies() {
+        return (DEPENDENCIES);
     }
 
 }
