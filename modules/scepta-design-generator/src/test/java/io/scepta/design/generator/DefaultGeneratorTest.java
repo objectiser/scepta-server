@@ -30,6 +30,7 @@ import io.scepta.design.util.PolicyDefinitionUtil;
 
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,6 +42,11 @@ public class DefaultGeneratorTest {
     private static final String ACTIVEMQ_QUEUE_TEST = "activemq:queue:test";
     private static final String TEST_ENDPOINT = "test";
     private static final ObjectMapper MAPPER=new ObjectMapper();
+
+    @BeforeClass
+    public static void setup() {
+        System.setProperty("scepta.version", "0.1.0-SNAPSHOT");
+    }
 
     @Test
     public void testProcessEndpointURIConsumer() {

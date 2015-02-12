@@ -31,6 +31,7 @@ import io.scepta.design.model.Endpoint;
 import io.scepta.design.model.PolicyGroup;
 import io.scepta.design.util.DOMUtil;
 import io.scepta.design.util.PolicyDefinitionUtil;
+import io.scepta.runtime.SceptaRuntimeVersion;
 
 /**
  * This class implements the 'BatchWithRetryOnFailure' characteristic.
@@ -72,7 +73,7 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
         DEPENDENCIES.add(new Dependency()
                 .setGroupId("io.scepta")
                 .setArtifactId("scepta-runtime")
-                .setVersion("0.1.0-SNAPSHOT"));
+                .setVersion(SceptaRuntimeVersion.getVersion()));
     }
 
     /**
