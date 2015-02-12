@@ -20,6 +20,8 @@ import static org.junit.Assert.*;
 
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import io.scepta.design.model.Endpoint;
 import io.scepta.design.model.PolicyGroup;
@@ -187,6 +189,36 @@ public class DefaultGeneratorTest {
 
         } catch (Exception e) {
             fail("Failed to export war: "+e);
+        }
+
+        // Check zip
+        try {
+            java.io.File f=java.io.File.createTempFile(group.getGroupDetails().getName(), ".zip");
+            f.deleteOnExit();
+
+            java.io.FileOutputStream fos=new java.io.FileOutputStream(f);
+
+            result.asZip(fos);
+
+            // Check zip file can be loaded
+            ZipFile zipFile=new ZipFile(f);
+
+            java.util.Enumeration<? extends ZipEntry> iter=zipFile.entries();
+
+            while (iter.hasMoreElements()) {
+                ZipEntry entry=iter.nextElement();
+                java.io.InputStream is=zipFile.getInputStream(entry);
+
+                // TODO: Any checks?
+
+                is.close();
+            }
+
+            zipFile.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Failed to export zip: "+e);
         }
     }
 

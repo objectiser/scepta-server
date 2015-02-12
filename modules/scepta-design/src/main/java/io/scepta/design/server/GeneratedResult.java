@@ -16,7 +16,6 @@
  */
 package io.scepta.design.server;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.ZipEntry;
@@ -67,30 +66,30 @@ public class GeneratedResult {
         return (this);
     }
 
-    public OutputStream asZip() throws Exception {
-        ByteArrayOutputStream os=new ByteArrayOutputStream();
+    public void asZip(OutputStream os) throws Exception {
         ZipOutputStream zip=new ZipOutputStream(os);
 
         for (WebArchive war : _generated.values()) {
-            ZipEntry entry=new ZipEntry(war.getName());
+            ZipEntry entry=new ZipEntry(war.getName()+".war");
             zip.putNextEntry(entry);
 
             InputStream is=war.as(ZipExporter.class).exportAsInputStream();
 
             byte[] b=new byte[10240];
-            int off=0;
 
-            while (is.available() > 0) {
-                int len=is.read(b);
+            int len=is.read(b);
 
-                zip.write(b, off, len);
-
-                off += len;
+            while (len > 0) {
+                zip.write(b, 0, len);
+                len = is.read(b);
             }
+
+            zip.closeEntry();
 
             is.close();
         }
 
-        return (os);
+        zip.close();
+        os.close();
     }
 }

@@ -23,6 +23,7 @@ import java.util.ServiceLoader;
 public abstract class AbstractDesignServer {
 
     private DesignRepository _repository;
+    private BuildServer _buildServer;
 
     public void setRepository(DesignRepository repo) {
         _repository = repo;
@@ -34,6 +35,18 @@ public abstract class AbstractDesignServer {
             _repository = sl.iterator().next();
         }
         return (_repository);
+    }
+
+    public void setBuildServer(BuildServer buildServer) {
+        _buildServer = buildServer;
+    }
+
+    public BuildServer getBuildServer() {
+        if (_buildServer == null) {
+            ServiceLoader<BuildServer> sl=ServiceLoader.load(BuildServer.class);
+            _buildServer = sl.iterator().next();
+        }
+        return (_buildServer);
     }
 
     /**
