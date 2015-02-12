@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.scepta.design.generator.charactistics;
+package io.scepta.design.generator.characteristics;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -70,7 +70,7 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
      */
     @Override
     public String getType() {
-        return getClass().getName();
+        return getClass().getSimpleName();
     }
 
     /**

@@ -17,11 +17,19 @@
 package io.scepta.design.generator;
 
 import static org.junit.Assert.*;
+
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+
 import io.scepta.design.model.Endpoint;
 import io.scepta.design.model.PolicyGroup;
+import io.scepta.design.server.GeneratedResult;
 import io.scepta.design.server.PolicyGroupInterchange;
+import io.scepta.design.util.DOMUtil;
 import io.scepta.design.util.PolicyDefinitionUtil;
 
+import org.jboss.shrinkwrap.api.exporter.ZipExporter;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -135,6 +143,44 @@ public class DefaultGeneratorTest {
             assertEquals(ACTIVEMQ_QUEUE_TEST+"?existing=value&op1=val1&op2=val2", newuri);
         } catch (Exception e) {
             fail("Failed to process endpoint uri: "+e);
+        }
+    }
+
+    @Test
+    public void testGenerate() {
+        PolicyGroupInterchange group=getPolicyGroupInterchange("RESTProducer");
+
+        DefaultGenerator generator=new DefaultGenerator();
+
+        GeneratedResult result=generator.generate(group);
+
+        assertTrue(result.getGenerated().containsKey("ActivityServer"));
+
+        WebArchive war=result.getGenerated().get("ActivityServer");
+
+        try {
+            java.io.File f=java.io.File.createTempFile(war.getName(), ".war");
+            f.deleteOnExit();
+
+            war.as(ZipExporter.class).exportTo(f, true);
+
+            JarFile jar=new JarFile(f);
+            java.util.Enumeration<JarEntry> iter=jar.entries();
+
+            while (iter.hasMoreElements()) {
+                JarEntry entry=iter.nextElement();
+
+                if (entry.getName().endsWith(".xml")) {
+                    // Check xml is parsable
+                    java.io.InputStream is=jar.getInputStream(entry);
+                    DOMUtil.textToDoc(is);
+                }
+            }
+
+            jar.close();
+
+        } catch (Exception e) {
+            fail("Failed to export war: "+e);
         }
     }
 

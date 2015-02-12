@@ -47,6 +47,9 @@
     <version.org.jboss.resteasy>2.3.7.Final</version.org.jboss.resteasy>
     <version.org.jboss.spec.javax.ws.rs>1.0.1.Final</version.org.jboss.spec.javax.ws.rs>
     <version.org.overlord.rtgov>2.1.0-SNAPSHOT</version.org.overlord.rtgov>
+    <version.org.jboss.shrinkwrap>1.2.2</version.org.jboss.shrinkwrap>
+    <version.org.jboss.shrinkwrap.descriptors>2.0.0-alpha-3</version.org.jboss.shrinkwrap.descriptors>
+    <version.org.jboss.shrinkwrap.resolver>2.0.0</version.org.jboss.shrinkwrap.resolver>
 
     <version.org.springframework>4.1.1.RELEASE</version.org.springframework>
   </properties>
@@ -270,6 +273,29 @@
         <version>${version.org.springframework}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.jboss.shrinkwrap</groupId>
+        <artifactId>shrinkwrap-api</artifactId>
+        <version>${version.org.jboss.shrinkwrap}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.shrinkwrap</groupId>
+        <artifactId>shrinkwrap-spi</artifactId>
+        <version>${version.org.jboss.shrinkwrap}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.shrinkwrap</groupId>
+        <artifactId>shrinkwrap-impl-base</artifactId>
+        <version>${version.org.jboss.shrinkwrap}</version>
+      </dependency>
+      <dependency>
+        <!-- WARNING: org.jboss.shrinkwrap.resolver:shrinkwrap-resolver-bom must be defined BEFORE org.jboss.arquillian:arquillian-bom -->
+        <groupId>org.jboss.shrinkwrap.resolver</groupId>
+        <artifactId>shrinkwrap-resolver-bom</artifactId>
+        <version>${version.org.jboss.shrinkwrap.resolver}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

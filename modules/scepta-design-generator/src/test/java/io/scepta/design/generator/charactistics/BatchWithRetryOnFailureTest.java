@@ -17,6 +17,7 @@
 package io.scepta.design.generator.charactistics;
 
 import static org.junit.Assert.*;
+import io.scepta.design.generator.characteristics.BatchWithRetryOnFailure;
 import io.scepta.design.model.Characteristic;
 import io.scepta.design.model.Endpoint;
 import io.scepta.design.model.PolicyGroup;

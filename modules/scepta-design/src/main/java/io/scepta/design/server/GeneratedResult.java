@@ -18,6 +18,8 @@ package io.scepta.design.server;
 
 import io.scepta.design.model.Issue;
 
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+
 /**
  * This class represents a wrapper for the generated executable
  * representation of a policy group, and any issues that were
@@ -26,14 +28,23 @@ import io.scepta.design.model.Issue;
  */
 public class GeneratedResult {
 
-    private java.util.Map<String,Object> _generated=new java.util.HashMap<String,Object>();
+    private java.util.Map<String,WebArchive> _generated=new java.util.HashMap<String,WebArchive>();
     private java.util.List<Issue> _issues=new java.util.ArrayList<Issue>();
+    private PolicyGroupInterchange _group;
 
-    public java.util.Map<String,Object> getGenerated() {
+    public GeneratedResult(PolicyGroupInterchange group) {
+        _group = group;
+    }
+
+    public PolicyGroupInterchange getGroup() {
+        return (_group);
+    }
+
+    public java.util.Map<String,WebArchive> getGenerated() {
         return (_generated);
     }
 
-    public GeneratedResult setGenerated(java.util.Map<String,Object> gen) {
+    public GeneratedResult setGenerated(java.util.Map<String,WebArchive> gen) {
         _generated = gen;
 
         return (this);
@@ -48,4 +59,5 @@ public class GeneratedResult {
 
         return (this);
     }
+
 }

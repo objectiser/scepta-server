@@ -18,6 +18,9 @@ package io.scepta.design.generator;
 
 import java.util.Collections;
 
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -39,14 +42,28 @@ public class DefaultGenerator implements Generator {
 
     @Override
     public GeneratedResult generate(PolicyGroupInterchange group) {
-        GeneratedResult ret=new GeneratedResult();
+        GeneratedResult ret=new GeneratedResult(group);
 
         // Process each policy
         for (Policy policy : group.getPolicyDetails()) {
 
             // Process the policy definition
-            generatePolicyDefinition(group.getGroupDetails(),
+            String policyDefn=generatePolicyDefinition(group.getGroupDetails(),
                     group.getPolicyDefinitions().get(policy.getName()));
+
+            if (policyDefn != null) {
+                try {
+                    WebArchive war=ShrinkWrap.create(WebArchive.class,
+                            group.getGroupDetails().getName()+"-"+policy.getName());
+
+                    war.addAsWebInfResource(new StringAsset(policyDefn), "classes/camel-config.xml");
+
+                    ret.getGenerated().put(policy.getName(), war);
+                } catch (Exception e) {
+                    // TODO: REPORT ERROR
+                    e.printStackTrace();
+                }
+            }
         }
 
         return ret;
