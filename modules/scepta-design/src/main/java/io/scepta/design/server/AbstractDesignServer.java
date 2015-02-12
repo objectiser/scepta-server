@@ -16,10 +16,12 @@
  */
 package io.scepta.design.server;
 
-import io.scepta.design.model.Tag;
-
 import java.util.ServiceLoader;
 
+/**
+ * This class represents an abstract implementation of the design server.
+ *
+ */
 public abstract class AbstractDesignServer {
 
     private DesignRepository _repository;
@@ -53,9 +55,11 @@ public abstract class AbstractDesignServer {
      * This method initiates the build associated with a supplied
      * tag.
      *
+     * @param organization The organization
+     * @param group The group
      * @param tag The tag
      */
-    public void initBuild(Tag tag) {
-
+    public void initBuild(String organization, String group, String tag) {
+        _buildServer.schedule(organization, group, tag);
     }
 }

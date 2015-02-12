@@ -211,7 +211,7 @@ public class RESTDesignServer extends AbstractDesignServer {
         Tag tag=getRepository().createTag(orgName, groupName, tagName, description);
 
         // Create build
-        initBuild(tag);
+        initBuild(orgName, groupName, tagName);
 
         return (success(tag));
     }
