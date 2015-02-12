@@ -16,33 +16,21 @@
  */
 package io.scepta.design.server;
 
-import io.scepta.design.model.Tag;
-
-import java.util.ServiceLoader;
-
-public abstract class AbstractDesignServer {
-
-    private DesignRepository _repository;
-
-    public void setRepository(DesignRepository repo) {
-        _repository = repo;
-    }
-
-    public DesignRepository getRepository() {
-        if (_repository == null) {
-            ServiceLoader<DesignRepository> sl=ServiceLoader.load(DesignRepository.class);
-            _repository = sl.iterator().next();
-        }
-        return (_repository);
-    }
+/**
+ * This interface represents a build server responsible for generating
+ * the executable version of a policy group.
+ *
+ */
+public interface BuildServer {
 
     /**
-     * This method initiates the build associated with a supplied
-     * tag.
+     * This method schedules the build of a policy group associated
+     * with the supplied organization, group name and tag.
      *
-     * @param tag The tag
+     * @param organization The organization
+     * @param group The policy group
+     * @param tag The tag name
      */
-    public void initBuild(Tag tag) {
+    void schedule(String organization, String group, String tag);
 
-    }
 }

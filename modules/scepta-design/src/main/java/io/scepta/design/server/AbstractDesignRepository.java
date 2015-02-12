@@ -425,7 +425,7 @@ public abstract class AbstractDesignRepository implements DesignRepository {
                     .setBuildStatus(BuildStatus.Created)
                     .setBuildTimestamp(System.currentTimeMillis());
 
-            doAddTag(org, group, tag);
+            doCreateTag(org, group, tag);
 
             return (tag);
         } else {
@@ -433,7 +433,7 @@ public abstract class AbstractDesignRepository implements DesignRepository {
         }
     }
 
-    protected abstract void doAddTag(String org, String group, Tag tag);
+    protected abstract void doCreateTag(String org, String group, Tag tag);
 
     /**
      * {@inheritDoc}
@@ -458,6 +458,18 @@ public abstract class AbstractDesignRepository implements DesignRepository {
     }
 
     protected abstract Tag doGetTag(String org, String group, String tag);
+
+    /**
+     * {@inheritDoc}
+     */
+    public void updateTag(String org, String group, Tag tag) {
+
+        // TODO: Check permission
+
+        doUpdateTag(org, group, tag);
+    }
+
+    protected abstract void doUpdateTag(String org, String group, Tag tag);
 
     /**
      * {@inheritDoc}

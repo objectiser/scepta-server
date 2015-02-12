@@ -19,6 +19,7 @@ package io.scepta.design.server.rest;
 import io.scepta.design.model.Organization;
 import io.scepta.design.model.Policy;
 import io.scepta.design.model.PolicyGroup;
+import io.scepta.design.model.Tag;
 import io.scepta.design.server.AbstractDesignServer;
 import io.scepta.design.server.PolicyGroupInterchange;
 
@@ -83,7 +84,7 @@ public class RESTDesignServer extends AbstractDesignServer {
      * @param organization The organization
      * @return Whether the operation was successful
      */
-    @POST
+    @PUT
     @Path("/{orgName}")
     @Consumes("application/json")
     public Response setOrganization(@PathParam("orgName") String orgName, Organization organization) {
@@ -200,14 +201,19 @@ public class RESTDesignServer extends AbstractDesignServer {
      * @param description The description
      * @return The tag name (if not specified then one will be generated)
      */
-    @PUT
+    @POST
     @Path("/{orgName}/group/{groupName}/tag")
     @Consumes("text/plain")
     @Produces("application/json")
     public Response createTag(@PathParam("orgName") String orgName,
                                     @PathParam("groupName") String groupName,
                                     @QueryParam("name") String tagName, String description) {
-        return (success(getRepository().createTag(orgName, groupName, tagName, description)));
+        Tag tag=getRepository().createTag(orgName, groupName, tagName, description);
+
+        // Create build
+        initBuild(tag);
+
+        return (success(tag));
     }
 
     /**
@@ -269,7 +275,7 @@ public class RESTDesignServer extends AbstractDesignServer {
      * @param group The policy group
      * @return Whether the operation was successful
      */
-    @POST
+    @PUT
     @Path("/{orgName}/group/{groupName}")
     @Consumes("application/json")
     public Response setPolicyGroup(@PathParam("orgName") String orgName,
@@ -345,7 +351,7 @@ public class RESTDesignServer extends AbstractDesignServer {
      * @param policy The policy
      * @return Whether the operation was successful
      */
-    @POST
+    @PUT
     @Path("/{orgName}/group/{groupName}/policy/{policyName}")
     @Consumes("application/json")
     public Response setPolicy(@PathParam("orgName") String orgName,

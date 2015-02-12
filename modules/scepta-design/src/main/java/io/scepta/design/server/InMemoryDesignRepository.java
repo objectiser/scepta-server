@@ -371,6 +371,15 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
+    protected void doCreateTag(String org, String group, Tag tag) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected List<Tag> doGetTags(String org, String group) {
         // TODO Auto-generated method stub
         return null;
@@ -389,7 +398,7 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected void doRemoveTag(String org, String group, String tag) {
+    protected void doUpdateTag(String org, String group, Tag tag) {
         // TODO Auto-generated method stub
     }
 
@@ -397,8 +406,7 @@ public class InMemoryDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected void doAddTag(String org, String group, Tag tag) {
+    protected void doRemoveTag(String org, String group, String tag) {
         // TODO Auto-generated method stub
-
     }
 }

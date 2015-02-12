@@ -56,6 +56,7 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
     private PreparedStatement _updatePolicy;
     private PreparedStatement _updatePolicyDefinition;
     private PreparedStatement _updateResourceDefinition;
+    private PreparedStatement _updateTag;
     private PreparedStatement _removeOrganization;
     private PreparedStatement _removePolicyGroup;
     private PreparedStatement _removePolicy;
@@ -149,6 +150,13 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
                 "tag = '"+DesignRepository.MASTER_TAG+"' AND " +
                 "policy = ? AND " +
                 "resource = ?;");
+
+        _updateTag = _session.prepare(
+                "UPDATE scepta.tags " +
+                "SET data = ? " +
+                "WHERE organization = ? AND " +
+                "group = ? AND " +
+                "tag = ?;");
 
         _removeOrganization = _session.prepare(
                 "DELETE FROM scepta.organizations " +
@@ -653,13 +661,30 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
      * {@inheritDoc}
      */
     @Override
-    protected void doAddTag(String org, String group, Tag tag) {
+    protected void doCreateTag(String org, String group, Tag tag) {
         BoundStatement boundStatement = new BoundStatement(_insertTag);
 
         try {
             String data=MAPPER.writeValueAsString(tag);
 
             _session.execute(boundStatement.bind(org, group, tag.getName(), data));
+        } catch (Exception e) {
+            // TODO: Handle exception
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doUpdateTag(String org, String group, Tag tag) {
+        BoundStatement boundStatement = new BoundStatement(_updateTag);
+
+        try {
+            String data=MAPPER.writeValueAsString(tag);
+
+            _session.execute(boundStatement.bind(data, org, group, tag.getName()));
         } catch (Exception e) {
             // TODO: Handle exception
             e.printStackTrace();

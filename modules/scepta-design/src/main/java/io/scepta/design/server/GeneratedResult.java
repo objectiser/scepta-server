@@ -16,8 +16,15 @@
  */
 package io.scepta.design.server;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
 import io.scepta.design.model.Issue;
 
+import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
 /**
@@ -60,4 +67,30 @@ public class GeneratedResult {
         return (this);
     }
 
+    public OutputStream asZip() throws Exception {
+        ByteArrayOutputStream os=new ByteArrayOutputStream();
+        ZipOutputStream zip=new ZipOutputStream(os);
+
+        for (WebArchive war : _generated.values()) {
+            ZipEntry entry=new ZipEntry(war.getName());
+            zip.putNextEntry(entry);
+
+            InputStream is=war.as(ZipExporter.class).exportAsInputStream();
+
+            byte[] b=new byte[10240];
+            int off=0;
+
+            while (is.available() > 0) {
+                int len=is.read(b);
+
+                zip.write(b, off, len);
+
+                off += len;
+            }
+
+            is.close();
+        }
+
+        return (os);
+    }
 }

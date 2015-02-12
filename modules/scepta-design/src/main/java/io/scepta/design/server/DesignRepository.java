@@ -120,6 +120,8 @@ public interface DesignRepository {
 
     Tag getTag(String org, String group, String tag);
 
+    void updateTag(String org, String group, Tag tag);
+
     void removeTag(String org, String group, String tag);
 
 }
