@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ServiceLoader;
 
-import io.scepta.design.server.DeploymentServer;
+import io.scepta.server.DeploymentServer;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

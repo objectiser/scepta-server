@@ -32,13 +32,13 @@
   </parent>
 
   <modules>
+    <module>scepta-builder</module>
+    <module>scepta-core</module>
     <module>scepta-deployment-filesystem</module>
     <module>scepta-deployment-rest</module>
-    <module>scepta-design</module>
-    <module>scepta-design-builder</module>
     <module>scepta-design-cassandra</module>
-    <module>scepta-design-generator</module>
     <module>scepta-design-rest</module>
+    <module>scepta-generator</module>
     <module>scepta-runtime</module>
   </modules>
 </project>

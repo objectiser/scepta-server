@@ -16,12 +16,12 @@
  */
 package io.scepta.design.server.rest;
 
-import io.scepta.design.model.Organization;
-import io.scepta.design.model.Policy;
-import io.scepta.design.model.PolicyGroup;
-import io.scepta.design.model.Tag;
-import io.scepta.design.server.AbstractDesignServer;
-import io.scepta.design.server.PolicyGroupInterchange;
+import io.scepta.model.Organization;
+import io.scepta.model.Policy;
+import io.scepta.model.PolicyGroup;
+import io.scepta.model.Tag;
+import io.scepta.server.AbstractDesignServer;
+import io.scepta.server.PolicyGroupInterchange;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;

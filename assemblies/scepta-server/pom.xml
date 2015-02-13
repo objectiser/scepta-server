@@ -34,25 +34,12 @@
   <dependencies>
     <dependency>
       <groupId>io.scepta</groupId>
-      <artifactId>scepta-design</artifactId>
+      <artifactId>scepta-builder</artifactId>
     </dependency>
 
     <dependency>
       <groupId>io.scepta</groupId>
-      <artifactId>scepta-design-cassandra</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.scepta</groupId>
-      <artifactId>scepta-design-generator</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.scepta</groupId>
-      <artifactId>scepta-design-rest</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.scepta</groupId>
-      <artifactId>scepta-design-builder</artifactId>
+      <artifactId>scepta-core</artifactId>
     </dependency>
 
     <dependency>
@@ -62,6 +49,20 @@
     <dependency>
       <groupId>io.scepta</groupId>
       <artifactId>scepta-deployment-rest</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.scepta</groupId>
+      <artifactId>scepta-design-cassandra</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.scepta</groupId>
+      <artifactId>scepta-design-rest</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.scepta</groupId>
+      <artifactId>scepta-generator</artifactId>
     </dependency>
 
     <!-- Test dependencies -->

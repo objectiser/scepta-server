@@ -34,7 +34,7 @@
   <dependencies>
     <dependency>
       <groupId>io.scepta</groupId>
-      <artifactId>scepta-design</artifactId>
+      <artifactId>scepta-core</artifactId>
     </dependency>
 
     <dependency>

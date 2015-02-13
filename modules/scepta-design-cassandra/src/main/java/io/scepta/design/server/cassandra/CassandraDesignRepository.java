@@ -16,12 +16,12 @@
  */
 package io.scepta.design.server.cassandra;
 
-import io.scepta.design.model.Organization;
-import io.scepta.design.model.Policy;
-import io.scepta.design.model.PolicyGroup;
-import io.scepta.design.model.Tag;
-import io.scepta.design.server.AbstractDesignRepository;
-import io.scepta.design.server.DesignRepository;
+import io.scepta.model.Organization;
+import io.scepta.model.Policy;
+import io.scepta.model.PolicyGroup;
+import io.scepta.model.Tag;
+import io.scepta.server.AbstractDesignRepository;
+import io.scepta.server.DesignRepository;
 
 import java.util.Collections;
 import java.util.Comparator;

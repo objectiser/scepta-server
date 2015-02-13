@@ -21,9 +21,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>scepta-deployment-rest</artifactId>
+  <artifactId>scepta-generator</artifactId>
   <packaging>jar</packaging>
-  <name>Scepta::Modules::Deployment REST</name>
+  <name>Scepta::Modules::Generator</name>
 
   <parent>
     <groupId>io.scepta</groupId>
@@ -36,30 +36,44 @@
       <groupId>io.scepta</groupId>
       <artifactId>scepta-core</artifactId>
     </dependency>
-
     <dependency>
-      <groupId>javax</groupId>
-      <artifactId>javaee-api</artifactId>
-      <scope>provided</scope>
+      <groupId>io.scepta</groupId>
+      <artifactId>scepta-runtime</artifactId>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jackson-provider</artifactId>
-      <scope>provided</scope>
+      <groupId>org.jboss.shrinkwrap</groupId>
+      <artifactId>shrinkwrap-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
-      <scope>provided</scope>
+      <groupId>org.jboss.shrinkwrap</groupId>
+      <artifactId>shrinkwrap-spi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap</groupId>
+      <artifactId>shrinkwrap-impl-base</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.spec.javax.ws.rs</groupId>
-      <artifactId>jboss-jaxrs-api_1.1_spec</artifactId>
-      <scope>provided</scope>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>

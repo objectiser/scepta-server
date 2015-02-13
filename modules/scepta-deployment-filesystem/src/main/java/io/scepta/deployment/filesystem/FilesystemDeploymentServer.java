@@ -21,7 +21,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import io.scepta.design.server.DeploymentServer;
+import io.scepta.server.DeploymentServer;
 
 /**
  * This class represents the filesystem implementation of the Deployment Server.

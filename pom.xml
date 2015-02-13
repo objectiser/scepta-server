@@ -63,29 +63,19 @@
     <dependencies>
       <dependency>
         <groupId>io.scepta</groupId>
-        <artifactId>scepta-design</artifactId>
+        <artifactId>scepta-core</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
         <groupId>io.scepta</groupId>
-        <artifactId>scepta-design-builder</artifactId>
+        <artifactId>scepta-builder</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
         <groupId>io.scepta</groupId>
         <artifactId>scepta-design-cassandra</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.scepta</groupId>
-        <artifactId>scepta-design-generator</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.scepta</groupId>
-        <artifactId>scepta-design-builder</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -102,6 +92,12 @@
       <dependency>
         <groupId>io.scepta</groupId>
         <artifactId>scepta-deployment-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.scepta</groupId>
+        <artifactId>scepta-generator</artifactId>
         <version>${project.version}</version>
       </dependency>
 
