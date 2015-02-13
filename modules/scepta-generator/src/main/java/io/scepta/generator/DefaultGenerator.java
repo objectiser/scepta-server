@@ -63,10 +63,29 @@ public class DefaultGenerator implements Generator {
                         group.getResourceDefinitions().get(resource.getName()), war);
             }
 
+            // Add web.xml
+            addWebXML(war);
+
             ret.getGenerated().put(policy.getName(), war);
         }
 
         return ret;
+    }
+
+    /**
+     * This method adds a web.xml file to the archive.
+     *
+     * @param war The web archive
+     */
+    protected static void addWebXML(WebArchive war) {
+        java.net.URL url=DefaultGenerator.class.getResource("/templates/camel-web-xml");
+
+        if (url != null) {
+            war.setWebXML(url);
+        } else {
+            // TODO: REPORT ERROR
+            System.err.println("FAILED TO ADD CAMEL WEB.XML");
+        }
     }
 
     /**
