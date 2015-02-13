@@ -80,7 +80,7 @@ insert into scepta.policygroups (organization, group, tag, data)
     "description": "Runtime Governance policy group",
     "endpoints": [{
         "name": "activityunits",
-        "actual": "activemq:queue:activityunits",
+        "uri": "activemq:queue:activityunits",
         "description": "Activity Units",
         "characteristics": [{
             "type": "Queue",
@@ -104,7 +104,7 @@ insert into scepta.policygroups (organization, group, tag, data)
         "producerOptions": {}
     },{
         "name": "servicedefns",
-        "actual": "activemq:queue:servicedefns",
+        "uri": "activemq:queue:servicedefns",
         "description": "Service Definitions derived from the Activity Units",
         "characteristics": [{
             "type": "Queue",
@@ -128,7 +128,7 @@ insert into scepta.policygroups (organization, group, tag, data)
         "producerOptions": {}
     },{
         "name": "responsetimes",
-        "actual": "activemq:queue:responsetimes",
+        "uri": "activemq:queue:responsetimes",
         "description": "Response time information",
         "characteristics": [{
             "type": "Queue",
@@ -152,7 +152,7 @@ insert into scepta.policygroups (organization, group, tag, data)
         "producerOptions": {}
     },{
         "name": "situations",
-        "actual": "activemq:queue:situations",
+        "uri": "activemq:queue:situations",
         "description": "Reported Situations",
         "characteristics": [{
             "type": "Queue",
@@ -183,12 +183,16 @@ insert into scepta.policies (organization, group, tag, policy, data)
     "description": "Activity server for reporting activities related to runtime governance",
     "dependencies": [],
     "name": "ActivityServer",
-    "resources": []
+    "resources": [{
+        "name": "web.xml",
+        "description": "The web.xml file",
+        "dependencies": []
+    }]
 }');
 
 insert into scepta.policydefns (organization, group, tag, policy, data)
     values ('Overlord', 'RTGov', 'master', 'ActivityServer', '<?xml version="1.0" encoding="UTF-8"?>
-<bean xmlns="http://www.springframework.org/schema/beans"
+<beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:camel="http://camel.apache.org/schema/spring"
   xsi:schemaLocation="
@@ -196,7 +200,7 @@ insert into scepta.policydefns (organization, group, tag, policy, data)
             http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
   <camelContext xmlns="http://camel.apache.org/schema/spring">
-    <restConfiguration component="servlet" bindingMode="json" contextPath="gov-next-example-activity-rest/rest" port="8080">
+    <restConfiguration component="servlet" bindingMode="json" contextPath="overlord-rtgov" port="8080">
       <dataFormatProperty key="prettyPrint" value="true"/>
     </restConfiguration>
 
@@ -220,11 +224,7 @@ insert into scepta.policydefns (organization, group, tag, policy, data)
 insert into scepta.policies (organization, group, tag, policy, data)
     values ('Overlord', 'RTGov', 'master', 'ServiceDefinition', '{
     "description": "Convert activity units into a description of the activity that occurred within a service.",
-    "dependencies": [{
-        "groupId": "org.overlord.rtgov.examples",
-        "artifactId": "servicedefnprocessor",
-        "version": "something"
-    }],
+    "dependencies": [],
     "name": "ServiceDefinition",
     "resources": []
 }');
@@ -252,11 +252,7 @@ insert into scepta.policydefns (organization, group, tag, policy, data)
 insert into scepta.policies (organization, group, tag, policy, data)
     values ('Overlord', 'RTGov', 'master', 'ResponseTime', '{
     "description": "Convert service definitions into response time information.",
-    "dependencies": [{
-        "groupId": "org.overlord.rtgov.examples",
-        "artifactId": "responsetimeprocessor",
-        "version": "something"
-    }],
+    "dependencies": [],
     "name": "ResponseTime",
     "resources": []
 }');
@@ -345,5 +341,28 @@ if (body.average > 200) {
 }
 
 return sit;');
+
+insert into scepta.resourcedefns (organization, group, tag, policy, resource, data)
+    values ('Overlord', 'RTGov', 'master', 'ActivityServer', 'web.xml', '<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+  <display-name>Activity Rest Application</display-name>
+
+  <!-- to setup Camel Servlet -->
+  <servlet>
+    <display-name>Camel Http Transport Servlet</display-name>
+    <servlet-name>CamelServlet</servlet-name>
+    <servlet-class>org.apache.camel.component.servlet.CamelHttpTransportServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <!-- define that url path for the Camel Servlet to use -->
+  <servlet-mapping>
+    <servlet-name>CamelServlet</servlet-name>
+    <url-pattern>/rest/*</url-pattern>
+  </servlet-mapping>
+
+</web-app>');
 
 

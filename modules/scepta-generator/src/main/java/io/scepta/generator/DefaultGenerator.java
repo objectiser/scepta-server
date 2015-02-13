@@ -43,6 +43,8 @@ import io.scepta.util.PolicyDefinitionUtil;
  */
 public class DefaultGenerator implements Generator {
 
+    private static final String WEB_XML = "web.xml";
+
     @Override
     public GeneratedResult generate(PolicyGroupInterchange group) {
         GeneratedResult ret=new GeneratedResult(group);
@@ -81,7 +83,50 @@ public class DefaultGenerator implements Generator {
         java.net.URL url=DefaultGenerator.class.getResource("/templates/camel-web-xml");
 
         if (url != null) {
-            war.setWebXML(url);
+            // Check if web.xml already exists (added as a resource)
+            if (war.contains("WEB-INF/web.xml")) {
+                java.io.InputStream is1=null;
+                java.io.InputStream is2=null;
+
+                try {
+                    is1=url.openStream();
+
+                    org.w3c.dom.Document doc1=DOMUtil.textToDoc(is1);
+
+                    org.jboss.shrinkwrap.api.Node node=war.get("WEB-INF/web.xml");
+
+                    is2 = node.getAsset().openStream();
+
+                    org.w3c.dom.Document doc2=DOMUtil.textToDoc(is2);
+
+                    org.w3c.dom.NodeList nl=doc1.getDocumentElement().getChildNodes();
+
+                    for (int i=0; i < nl.getLength(); i++) {
+                        Node n=nl.item(i);
+                        if (n instanceof Element) {
+                            doc2.getDocumentElement().appendChild(doc2.importNode(n, true));
+                        }
+                    }
+
+                    String merged=DOMUtil.docToText(doc2);
+
+                    war.setWebXML(new StringAsset(merged));
+
+                } catch (Exception e) {
+                    // TODO: REPORT ERROR
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        is1.close();
+                        is2.close();
+                    } catch (Exception e) {
+                        // TODO: REPORT ERROR
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                war.setWebXML(url);
+            }
         } else {
             // TODO: REPORT ERROR
             System.err.println("FAILED TO ADD CAMEL WEB.XML");
@@ -330,7 +375,11 @@ public class DefaultGenerator implements Generator {
      */
     protected static void generateResource(PolicyGroup group, Policy policy, Resource resource,
                                     String definition, WebArchive war) {
-        war.addAsWebInfResource(new StringAsset(definition), "classes/"+resource.getName());
+        if (resource.getName().equals(WEB_XML)) {
+            war.setWebXML(new StringAsset(definition));
+        } else {
+            war.addAsWebInfResource(new StringAsset(definition), "classes/"+resource.getName());
+        }
 
         // Add resource dependencies
         addDependencies(war, resource.getDependencies());
