@@ -88,7 +88,7 @@ public class Tag {
         return (this);
     }
 
-    public long getBuildLastUpdate() {
+    public long getBuildTimestamp() {
         return (_buildTimestamp);
     }
 

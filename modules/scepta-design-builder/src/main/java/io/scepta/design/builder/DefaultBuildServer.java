@@ -23,6 +23,7 @@ import java.util.concurrent.Executors;
 import io.scepta.design.model.Tag;
 import io.scepta.design.model.Tag.BuildStatus;
 import io.scepta.design.server.BuildServer;
+import io.scepta.design.server.DeploymentServer;
 import io.scepta.design.server.DesignRepository;
 import io.scepta.design.server.GeneratedResult;
 import io.scepta.design.server.Generator;
@@ -39,6 +40,7 @@ public class DefaultBuildServer implements BuildServer {
 
     private DesignRepository _repository;
     private Generator _generator;
+    private DeploymentServer _deploymentServer;
     private ExecutorService _executorService=Executors.newFixedThreadPool(POOL_SIZE);
 
     /**
@@ -61,6 +63,28 @@ public class DefaultBuildServer implements BuildServer {
             _repository = sl.iterator().next();
         }
         return (_repository);
+    }
+
+    /**
+     * This method sets the deployment server.
+     *
+     * @param ds The deployment server
+     */
+    public void setDeploymentServer(DeploymentServer ds) {
+        _deploymentServer = ds;
+    }
+
+    /**
+     * This method returns the deployment server.
+     *
+     * @return The deployment server
+     */
+    public DeploymentServer getDeploymentServer() {
+        if (_deploymentServer == null) {
+            ServiceLoader<DeploymentServer> sl=ServiceLoader.load(DeploymentServer.class);
+            _deploymentServer = sl.iterator().next();
+        }
+        return (_deploymentServer);
     }
 
     /**
@@ -111,10 +135,28 @@ public class DefaultBuildServer implements BuildServer {
 
                         if (result != null) {
                             // Store the zip representation
+                            try {
+                                java.io.ByteArrayOutputStream os=new java.io.ByteArrayOutputStream();
 
-                            tag.setBuildStatus(BuildStatus.Successful);
-                            getRepository().updateTag(org, group, tag);
+                                result.asZip(os);
 
+                                java.io.ByteArrayInputStream is=new java.io.ByteArrayInputStream(os.toByteArray());
+
+                                os.close();
+
+                                getDeploymentServer().deploy(org, group, tag.getName(), is);
+
+                                is.close();
+
+                                tag.setBuildStatus(BuildStatus.Successful);
+                                getRepository().updateTag(org, group, tag);
+                            } catch (Exception e) {
+                                // TODO: REPORT ERROR
+                                e.printStackTrace();
+
+                                tag.setBuildStatus(BuildStatus.Failed);
+                                getRepository().updateTag(org, group, tag);
+                            }
                         } else {
                             tag.setBuildStatus(BuildStatus.Failed);
                             getRepository().updateTag(org, group, tag);

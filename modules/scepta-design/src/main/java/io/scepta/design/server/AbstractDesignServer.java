@@ -60,6 +60,6 @@ public abstract class AbstractDesignServer {
      * @param tag The tag
      */
     public void initBuild(String organization, String group, String tag) {
-        _buildServer.schedule(organization, group, tag);
+        getBuildServer().schedule(organization, group, tag);
     }
 }

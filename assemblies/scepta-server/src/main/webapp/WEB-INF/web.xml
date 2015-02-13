@@ -25,7 +25,7 @@
   <display-name>Scepta Server</display-name>
 
   <servlet>
-    <servlet-name>SceptaServer</servlet-name>
+    <servlet-name>SceptaDesignServer</servlet-name>
     <servlet-class>
             org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
     </servlet-class>
@@ -36,8 +36,24 @@
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>SceptaServer</servlet-name>
+    <servlet-name>SceptaDesignServer</servlet-name>
     <url-pattern>/design/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>SceptaDeploymentServer</servlet-name>
+    <servlet-class>
+            org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
+    </servlet-class>
+    <init-param>
+      <param-name>javax.ws.rs.Application</param-name>
+      <param-value>io.scepta.deployment.rest.RESTDeploymentServerApplication</param-value>
+    </init-param>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>SceptaDeploymentServer</servlet-name>
+    <url-pattern>/deployment/*</url-pattern>
   </servlet-mapping>
 
 </web-app>

@@ -683,6 +683,7 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
 
         try {
             String data=MAPPER.writeValueAsString(tag);
+System.out.println("UPDATE TAG: "+data);
 
             _session.execute(boundStatement.bind(data, org, group, tag.getName()));
         } catch (Exception e) {

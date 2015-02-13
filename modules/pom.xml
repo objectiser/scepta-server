@@ -32,6 +32,8 @@
   </parent>
 
   <modules>
+    <module>scepta-deployment-filesystem</module>
+    <module>scepta-deployment-rest</module>
     <module>scepta-design</module>
     <module>scepta-design-builder</module>
     <module>scepta-design-cassandra</module>
