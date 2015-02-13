@@ -283,6 +283,9 @@ public class DefaultGenerator implements Generator {
                 // Apply dependencies on endpoint
                 if (war != null) {
                     addDependencies(war, endpoint.getDependencies());
+
+                    // Check if dependencies associated with URI
+                    addDependencies(war, URIDependencyResolverManager.getDependencies(newuri));
                 }
 
                 return (true);
