@@ -16,12 +16,16 @@
  */
 package io.scepta.design.server.rest;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import io.scepta.model.Organization;
 import io.scepta.model.Policy;
 import io.scepta.model.PolicyGroup;
 import io.scepta.model.Tag;
 import io.scepta.server.AbstractDesignServer;
 import io.scepta.server.PolicyGroupInterchange;
+import io.scepta.util.JSONUtil;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -36,6 +40,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 /**
  * This class represents the RESTful interface to the scepta design server.
@@ -188,7 +194,24 @@ public class RESTDesignServer extends AbstractDesignServer {
     public Response export(@PathParam("orgName") String orgName,
                                     @PathParam("groupName") String groupName,
                                     @QueryParam("tag") String tag) {
-        return (success(getRepository().exportPolicyGroup(orgName, groupName, tag)));
+        StreamingOutput stream = new StreamingOutput() {
+            @Override
+            public void write(OutputStream os) throws IOException {
+                PolicyGroupInterchange export=getRepository().exportPolicyGroup(orgName, groupName, tag);
+System.out.println("EXPORT: "+export);
+                if (export != null) {
+                    JSONUtil.serialize(export, os);
+                } else {
+                    // TODO: REPORT ERROR
+                    throw new IOException("Failed to export group '"+groupName+"'");
+                }
+            }
+        };
+
+System.out.println("RETURNING AS FILE: "+groupName+".json");
+        ResponseBuilder response = Response.ok(stream);
+        response.header("Content-Disposition", "attachment; filename=\""+groupName+".json\"");
+        return (response.build());
     }
 
     /**
@@ -400,7 +423,29 @@ public class RESTDesignServer extends AbstractDesignServer {
                                     @PathParam("groupName") String groupName,
                                     @PathParam("policyName") String policyName,
                                     @QueryParam("tag") String tag) {
-        return (success(getRepository().getPolicyDefinition(orgName, groupName, tag, policyName)));
+        String defn=getRepository().getPolicyDefinition(orgName, groupName, tag, policyName);
+        return (success(defn));
+    }
+
+    /**
+     * This method sets the policy definition associated with the
+     * organization, group and policy name.
+     *
+     * @param orgName The organization name
+     * @param groupName The policy group name
+     * @param policyName The policy name
+     * @param definition The definition
+     * @return The response
+     */
+    @PUT
+    @Path("/{orgName}/group/{groupName}/policy/{policyName}/definition")
+    @Consumes("text/plain")
+    public Response setPolicyDefinition(@PathParam("orgName") String orgName,
+                                    @PathParam("groupName") String groupName,
+                                    @PathParam("policyName") String policyName,
+                                    String definition) {
+        getRepository().setPolicyDefinition(orgName, groupName, policyName, definition);
+        return (success());
     }
 
     /**
