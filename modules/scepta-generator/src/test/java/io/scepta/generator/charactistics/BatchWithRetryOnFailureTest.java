@@ -42,8 +42,8 @@ public class BatchWithRetryOnFailureTest {
         Characteristic ch=new Characteristic();
 
         ch.setType(BatchWithRetryOnFailure.class.getSimpleName());
-        ch.getProperties().put("completionSize", "111");
-        ch.getProperties().put("completionInterval", "2222");
+        ch.getProperties().put("batchSize", "111");
+        ch.getProperties().put("batchInterval", "2222");
 
         processor.process(group, endpoint, ch, elem);
 
@@ -74,8 +74,6 @@ public class BatchWithRetryOnFailureTest {
         Endpoint ep2=new Endpoint();
         Characteristic ch2=new Characteristic()
                 .setType(BatchWithRetryOnFailure.class.getSimpleName());
-        //ch.getProperties().put("completionSize", "111");
-        //ch.getProperties().put("completionInterval", "2222");
 
         processor.process(group, ep2, ch2, elem);
 

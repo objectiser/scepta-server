@@ -96,7 +96,7 @@ insert into scepta.policygroups (organization, group, tag, data)
         "dependencies": [{
             "groupId": "org.overlord.rtgov.activity-management",
             "artifactId": "activity",
-            "version": "2.1.0.Beta1"
+            "version": "2.1.0-SNAPSHOT"
         }],
         "consumerOptions": {
             "maxConcurrentConsumers": "30"
@@ -120,7 +120,7 @@ insert into scepta.policygroups (organization, group, tag, data)
         "dependencies": [{
             "groupId": "org.overlord.rtgov.activity-analysis",
             "artifactId": "analytics",
-            "version": "2.1.0.Beta1"
+            "version": "2.1.0-SNAPSHOT"
         }],
         "consumerOptions": {
             "maxConcurrentConsumers": "30"
@@ -144,7 +144,7 @@ insert into scepta.policygroups (organization, group, tag, data)
         "dependencies": [{
             "groupId": "org.overlord.rtgov.activity-analysis",
             "artifactId": "analytics",
-            "version": "2.1.0.Beta1"
+            "version": "2.1.0-SNAPSHOT"
         }],
         "consumerOptions": {
             "maxConcurrentConsumers": "30"
@@ -168,7 +168,7 @@ insert into scepta.policygroups (organization, group, tag, data)
         "dependencies": [{
             "groupId": "org.overlord.rtgov.activity-analysis",
             "artifactId": "analytics",
-            "version": "2.1.0.Beta1"
+            "version": "2.1.0-SNAPSHOT"
         }],
         "consumerOptions": {
             "maxConcurrentConsumers": "30"
@@ -360,7 +360,7 @@ insert into scepta.resourcedefns (organization, group, tag, policy, resource, da
   <!-- define that url path for the Camel Servlet to use -->
   <servlet-mapping>
     <servlet-name>CamelServlet</servlet-name>
-    <url-pattern>/rest/*</url-pattern>
+    <url-pattern>/*</url-pattern>
   </servlet-mapping>
 
 </web-app>');

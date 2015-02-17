@@ -244,8 +244,8 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
         route.appendChild(aggregate);
 
         aggregate.setAttribute("strategyRef", "aggregateStrategy");
-        aggregate.setAttribute("completionSize", characteristic.getProperties().get("completionSize"));
-        aggregate.setAttribute("completionInterval", characteristic.getProperties().get("completionInterval"));
+        aggregate.setAttribute("completionSize", characteristic.getProperties().get("batchSize"));
+        aggregate.setAttribute("completionInterval", characteristic.getProperties().get("batchInterval"));
 
         Element correlationExpression=elem.getOwnerDocument().createElement("correlationExpression");
         aggregate.appendChild(correlationExpression);
