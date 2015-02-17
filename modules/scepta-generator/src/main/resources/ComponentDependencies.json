@@ -1,0 +1,9 @@
+{
+    "dependencies": {
+        "activemq":[{
+            "groupId":"org.apache.activemq",
+            "artifactId":"activemq-camel",
+            "version":"5.10.0"
+        }]
+    }
+}

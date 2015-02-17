@@ -14,21 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.scepta.generator;
+package io.scepta.generator.dependency;
 
 import static org.junit.Assert.*;
 import io.scepta.model.Dependency;
 
 import org.junit.Test;
 
-public class URIDependencyResolverManagerTest {
+public class CamelDependencyResolverTest {
 
     @Test
     public void testGetCamelComponentDependenciesFound() {
-        String uri="jms:queue:test";
+        String uri="jms";
 
         java.util.Set<Dependency> dependencies=
-                    URIDependencyResolverManager.getCamelComponentDependencies(uri);
+                    CamelDependencyResolver.getCamelComponentDependencies(uri);
 
         assertNotNull(dependencies);
 
@@ -37,10 +37,10 @@ public class URIDependencyResolverManagerTest {
 
     @Test
     public void testGetCamelComponentDependenciesNotFound() {
-        String uri="madeup:test";
+        String uri="madeup";
 
         java.util.Set<Dependency> dependencies=
-                    URIDependencyResolverManager.getCamelComponentDependencies(uri);
+                CamelDependencyResolver.getCamelComponentDependencies(uri);
 
         assertNotNull(dependencies);
 

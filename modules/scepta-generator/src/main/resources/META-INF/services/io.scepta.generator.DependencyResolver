@@ -1,0 +1,2 @@
+io.scepta.generator.dependency.CamelDependencyResolver
+io.scepta.generator.dependency.ConfiguredDependencyResolver

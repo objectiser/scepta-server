@@ -14,31 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.scepta.generator;
+package io.scepta.generator.dependency;
 
+import static org.junit.Assert.*;
 import io.scepta.model.Dependency;
 
-/**
- * This interface represents a URI dependency resolver.
- *
- */
-public interface URIDependencyResolver {
+import org.junit.Test;
 
-    /**
-     * Whether this resolver supports the supplied URI.
-     *
-     * @param uri The URI
-     * @return Whether the supplied URI is supported
-     */
-    boolean isTypeSupported(String uri);
+public class ConfiguredDependencyResolverTest {
 
-    /**
-     * This method returns any dependencies associated with the
-     * URI.
-     *
-     * @param uri The URI
-     * @return The dependency set
-     */
-    java.util.Set<Dependency> getDependencies(String uri);
+    @Test
+    public void testConfiguredActiveMQ() {
 
+        ConfiguredDependencyResolver resolver=new ConfiguredDependencyResolver();
+
+        java.util.Set<Dependency> dependencies=resolver.getDependencies("activemq");
+
+        assertNotNull(dependencies);
+
+        assertTrue(dependencies.size() == 1);
+    }
 }
