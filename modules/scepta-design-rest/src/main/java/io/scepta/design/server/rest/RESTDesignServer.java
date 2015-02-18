@@ -471,6 +471,29 @@ System.out.println("RETURNING AS FILE: "+groupName+".json");
     }
 
     /**
+     * This method sets the resource definition associated with the
+     * organization, group, policy and resource name.
+     *
+     * @param orgName The organization name
+     * @param groupName The policy group name
+     * @param policyName The policy name
+     * @param resourceName The resource name
+     * @param definition The definition
+     * @return The response
+     */
+    @PUT
+    @Path("/{orgName}/group/{groupName}/policy/{policyName}/resource/{resourceName}")
+    @Consumes("text/plain")
+    public Response setResourceDefinition(@PathParam("orgName") String orgName,
+                                    @PathParam("groupName") String groupName,
+                                    @PathParam("policyName") String policyName,
+                                    @PathParam("resourceName") String resourceName,
+                                    String definition) {
+        getRepository().setResourceDefinition(orgName, groupName, policyName, resourceName, definition);
+        return (success());
+    }
+
+    /**
      * This method returns a successful response.
      *
      * @param result The result to be returned
