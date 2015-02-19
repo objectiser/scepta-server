@@ -277,8 +277,17 @@ public abstract class AbstractDesignRepository implements DesignRepository {
         // TODO: Check permission
 
         // Check if policy already exists
-        if (getPolicy(org, group, MASTER_TAG, policy.getName()) != null) {
+        Policy p=getPolicy(org, group, MASTER_TAG, policy.getName());
+
+        if (p != null) {
             doUpdatePolicy(org, group, policy);
+
+            // Check if any resources removed
+            for (Resource res : p.getResources()) {
+                if (policy.getResource(res.getName()) == null) {
+                    doRemoveResourceDefinition(org, group, policy.getName(), res.getName());
+                }
+            }
         } else {
             // TODO: Throw exception?
             throw new RuntimeException("Policy does not exists");
@@ -366,16 +375,6 @@ public abstract class AbstractDesignRepository implements DesignRepository {
 
     protected abstract void doSetResourceDefinition(String org, String group, String tag, String policy,
                 String resource, String definition);
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeResourceDefinition(String org, String group, String policy, String resource) {
-
-        // TODO: Check permitted to remove the resource definition
-
-        doRemoveResourceDefinition(org, group, policy, resource);
-    }
 
     protected abstract void doRemoveResourceDefinition(String org, String group, String policy, String resource);
 

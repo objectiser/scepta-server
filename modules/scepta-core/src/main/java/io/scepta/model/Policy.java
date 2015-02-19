@@ -78,4 +78,14 @@ public class Policy {
         _resources = resources;
         return (this);
     }
+
+    public Resource getResource(String name) {
+        for (Resource res : _resources) {
+            if (res.getName().equals(name)) {
+                return (res);
+            }
+        }
+
+        return (null);
+    }
 }
