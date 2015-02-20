@@ -30,6 +30,7 @@ import io.scepta.model.Dependency;
 import io.scepta.model.Endpoint;
 import io.scepta.model.PolicyGroup;
 import io.scepta.runtime.SceptaRuntimeVersion;
+import io.scepta.server.CharacteristicType;
 import io.scepta.util.DOMUtil;
 import io.scepta.util.PolicyDefinitionUtil;
 
@@ -43,8 +44,17 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
     private static final org.w3c.dom.Element CONSUMER_ONLY_TEMPLATE;
 
     private static final java.util.Set<Dependency> DEPENDENCIES=new java.util.HashSet<Dependency>();
+    private static CharacteristicType TYPE;
 
     static {
+        TYPE = new CharacteristicType().setName(BatchWithRetryOnFailure.class.getSimpleName());
+        TYPE.getPropertyDescriptors().put("batchSize",
+                new CharacteristicType.PropertyDescriptor().setMandatory(true).setDefaultValue("100"));
+        TYPE.getPropertyDescriptors().put("batchInterval",
+                new CharacteristicType.PropertyDescriptor().setMandatory(true).setDefaultValue("1000"));
+        TYPE.getPropertyDescriptors().put("maxRetry",
+                new CharacteristicType.PropertyDescriptor().setMandatory(true).setDefaultValue("3"));
+
         org.w3c.dom.Document cpdoc=null;
         org.w3c.dom.Document codoc=null;
 
@@ -80,8 +90,8 @@ public class BatchWithRetryOnFailure implements CharacteristicProcessor {
      * {@inheritDoc}
      */
     @Override
-    public String getType() {
-        return getClass().getSimpleName();
+    public CharacteristicType getType() {
+        return (TYPE);
     }
 
     /**

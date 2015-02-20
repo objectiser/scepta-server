@@ -17,6 +17,7 @@
 package io.scepta.generator;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
@@ -31,6 +32,7 @@ import io.scepta.model.Endpoint;
 import io.scepta.model.Policy;
 import io.scepta.model.PolicyGroup;
 import io.scepta.model.Resource;
+import io.scepta.server.CharacteristicType;
 import io.scepta.server.GeneratedResult;
 import io.scepta.server.Generator;
 import io.scepta.server.PolicyGroupInterchange;
@@ -400,5 +402,13 @@ public class DefaultGenerator implements Generator {
                     d.getGroupId()+":"+d.getArtifactId()+":"+d.getVersion())
                     .withTransitivity().asFile());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<CharacteristicType> getSupportedCharacteristicTypes() {
+        return (CharacteristicProcessorFactory.getCharacteristicTypes());
     }
 }

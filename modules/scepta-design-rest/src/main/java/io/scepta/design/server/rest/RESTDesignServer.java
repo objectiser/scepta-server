@@ -494,6 +494,18 @@ System.out.println("RETURNING AS FILE: "+groupName+".json");
     }
 
     /**
+     * This method returns the list of supported characteristics.
+     *
+     * @return The list of supported characteristics
+     */
+    @GET
+    @Path("/config/characteristics")
+    @Produces("application/json")
+    public Response getCharacteristicTypes() {
+        return (success(getGenerator().getSupportedCharacteristicTypes()));
+    }
+
+    /**
      * This method returns a successful response.
      *
      * @param result The result to be returned

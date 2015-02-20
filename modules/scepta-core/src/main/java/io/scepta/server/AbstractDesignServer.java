@@ -26,6 +26,7 @@ public abstract class AbstractDesignServer {
 
     private DesignRepository _repository;
     private BuildServer _buildServer;
+    private Generator _generator;
 
     public void setRepository(DesignRepository repo) {
         _repository = repo;
@@ -49,6 +50,18 @@ public abstract class AbstractDesignServer {
             _buildServer = sl.iterator().next();
         }
         return (_buildServer);
+    }
+
+    public void setGenerator(Generator generator) {
+        _generator = generator;
+    }
+
+    public Generator getGenerator() {
+        if (_generator == null) {
+            ServiceLoader<Generator> sl=ServiceLoader.load(Generator.class);
+            _generator = sl.iterator().next();
+        }
+        return (_generator);
     }
 
     /**

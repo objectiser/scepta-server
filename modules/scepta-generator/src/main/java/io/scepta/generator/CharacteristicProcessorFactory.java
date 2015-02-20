@@ -17,7 +17,10 @@
 package io.scepta.generator;
 
 import io.scepta.model.Characteristic;
+import io.scepta.server.CharacteristicType;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.ServiceLoader;
 
 /**
@@ -25,6 +28,9 @@ import java.util.ServiceLoader;
  *
  */
 public class CharacteristicProcessorFactory {
+
+    private static final ServiceLoader<CharacteristicProcessor> PROCESSORS=
+                    ServiceLoader.load(CharacteristicProcessor.class);
 
     /**
      * This method returns a processor associated with the supplied
@@ -34,15 +40,35 @@ public class CharacteristicProcessorFactory {
      * @return The characteristic processor, or null if not found
      */
     public static CharacteristicProcessor get(Characteristic characteristic) {
-        ServiceLoader<CharacteristicProcessor> processors=ServiceLoader.load(CharacteristicProcessor.class);
-
-        for (CharacteristicProcessor cp : processors) {
+        for (CharacteristicProcessor cp : PROCESSORS) {
             if (cp.getType().equals(characteristic.getType())) {
                 return (cp);
             }
         }
 
         return (null);
+    }
+
+    /**
+     * This method returns the list of characteristic types.
+     *
+     * @return The list of characteristic types
+     */
+    public static java.util.List<CharacteristicType> getCharacteristicTypes() {
+        java.util.List<CharacteristicType> ret=new java.util.ArrayList<CharacteristicType>();
+
+        for (CharacteristicProcessor cp : PROCESSORS) {
+            ret.add(cp.getType());
+        }
+
+        Collections.sort(ret, new Comparator<CharacteristicType>() {
+            public int compare(CharacteristicType o1, CharacteristicType o2) {
+                return (o1.getName().compareTo(o2.getName()));
+            }
+
+        });
+
+        return (ret);
     }
 
 }

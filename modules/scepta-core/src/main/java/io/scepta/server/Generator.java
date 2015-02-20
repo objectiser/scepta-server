@@ -27,4 +27,11 @@ public interface Generator {
      */
     GeneratedResult generate(PolicyGroupInterchange group);
 
+    /**
+     * This method returns the list of supported characteristic types.
+     *
+     * @return The list of characteristic types
+     */
+    java.util.List<CharacteristicType> getSupportedCharacteristicTypes();
+
 }

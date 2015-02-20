@@ -20,6 +20,7 @@ import io.scepta.model.Characteristic;
 import io.scepta.model.Dependency;
 import io.scepta.model.Endpoint;
 import io.scepta.model.PolicyGroup;
+import io.scepta.server.CharacteristicType;
 
 /**
  * This interface represents a processor associated with an endpoint characteristic.
@@ -32,7 +33,7 @@ public interface CharacteristicProcessor {
      *
      * @return The characteristic type
      */
-    String getType();
+    CharacteristicType getType();
 
     /**
      * This method processes the supplied policy definition based on the
