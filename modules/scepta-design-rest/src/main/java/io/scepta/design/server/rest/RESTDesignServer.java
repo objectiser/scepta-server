@@ -18,6 +18,8 @@ package io.scepta.design.server.rest;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.Comparator;
 
 import io.scepta.model.Organization;
 import io.scepta.model.Policy;
@@ -127,7 +129,16 @@ public class RESTDesignServer extends AbstractDesignServer {
     @Path("/{orgName}/group")
     @Produces("application/json")
     public Response getPolicyGroups(@PathParam("orgName") String orgName) {
-        return (success(getRepository().getPolicyGroups(orgName)));
+        java.util.List<PolicyGroup> groups=
+                new java.util.ArrayList<PolicyGroup>(getRepository().getPolicyGroups(orgName));
+
+        Collections.sort(groups, new Comparator<PolicyGroup>() {
+            public int compare(PolicyGroup o1, PolicyGroup o2) {
+                return (o2.getName().compareTo(o1.getName()));
+            }
+        });
+
+        return (success(groups));
     }
 
     /**

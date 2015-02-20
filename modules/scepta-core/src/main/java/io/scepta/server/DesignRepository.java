@@ -50,6 +50,12 @@ public interface DesignRepository {
 
     void removeOrganization(String name);
 
+    /**
+     * This method returns the list of 'master' policy groups.
+     *
+     * @param org The organization
+     * @return The list of 'master' policy groups within the specified organization
+     */
     java.util.Set<PolicyGroup> getPolicyGroups(String org);
 
     void addPolicyGroup(String org, PolicyGroup group);

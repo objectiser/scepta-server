@@ -106,7 +106,7 @@ public class RESTDeploymentServer {
         };
 
         ResponseBuilder response = Response.ok(stream);
-        response.header("Content-Disposition", "attachment; filename=\""+groupName+".zip\"");
+        response.header("Content-Disposition", "attachment; filename=\""+groupName+"-"+tagName+".zip\"");
         return (response.build());
     }
 

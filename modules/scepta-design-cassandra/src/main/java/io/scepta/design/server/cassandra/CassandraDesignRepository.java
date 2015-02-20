@@ -310,21 +310,43 @@ public class CassandraDesignRepository extends AbstractDesignRepository {
     }
 
     /**
+     * This method returns the policy group names for an organization.
+     *
+     * @param org The organization
+     * @return The list of policy group names
+     */
+    protected Set<String> doGetPolicyGroupNames(String org) {
+        java.util.Set<String> ret=new java.util.HashSet<String>();
+
+        ResultSet results = _session.execute("SELECT group FROM policygroups WHERE organization='"
+                                +org+"'");
+        for (Row row : results) {
+            ret.add(row.getString("group"));
+        }
+
+        return (ret);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     protected Set<PolicyGroup> doGetPolicyGroups(String org) {
         java.util.Set<PolicyGroup> ret=new java.util.HashSet<PolicyGroup>();
 
-        ResultSet results = _session.execute("SELECT data FROM policygroups WHERE organization='"+org+"'");
-        for (Row row : results) {
-            try {
-                String data=row.getString("data");
+        for (String groupName : doGetPolicyGroupNames(org)) {
+            ResultSet results = _session.execute("SELECT data FROM policygroups WHERE organization='"
+                                    +org+"' AND group = '"+groupName
+                                    +"' AND tag='"+DesignRepository.MASTER_TAG+"'");
+            for (Row row : results) {
+                try {
+                    String data=row.getString("data");
 
-                ret.add(MAPPER.readValue(data.getBytes(), PolicyGroup.class));
-            } catch (Exception e) {
-                // TODO: HANDLE EXCEPTION
-                e.printStackTrace();
+                    ret.add(MAPPER.readValue(data.getBytes(), PolicyGroup.class));
+                } catch (Exception e) {
+                    // TODO: HANDLE EXCEPTION
+                    e.printStackTrace();
+                }
             }
         }
 
