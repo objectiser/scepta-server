@@ -234,7 +234,7 @@ System.out.println("RETURNING AS FILE: "+groupName+".json");
         Tag tag=getRepository().createTag(orgName, groupName, tagName, description);
 
         // Create build
-        initBuild(orgName, groupName, tagName);
+        initBuild(orgName, groupName, tag.getName());
 
         return (success(tag));
     }
