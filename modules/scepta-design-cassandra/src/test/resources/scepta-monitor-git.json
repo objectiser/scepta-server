@@ -1,0 +1,14 @@
+{
+    "groupDetails": {
+        "description": "Monitor GIT repository and validate PRs, raising JIRA if errors found",
+        "endpoints": [
+        ],
+        "name": "MonitorGIT"
+    },
+    "policyDetails": [
+    ],
+    "policyDefinitions": {
+    },
+    "resourceDefinitions": {
+    }
+}
