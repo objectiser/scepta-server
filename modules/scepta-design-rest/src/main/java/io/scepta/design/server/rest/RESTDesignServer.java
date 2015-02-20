@@ -401,6 +401,28 @@ System.out.println("RETURNING AS FILE: "+groupName+".json");
     }
 
     /**
+     * This method adds a policy.
+     *
+     * @param orgName The organization name
+     * @param groupName The policy group name
+     * @param policy The policy
+     * @return Whether the operation was successful
+     */
+    @POST
+    @Path("/{orgName}/group/{groupName}/policy")
+    @Consumes("application/json")
+    public Response addPolicy(@PathParam("orgName") String orgName,
+                    @PathParam("groupName") String groupName,
+                    Policy policy) {
+
+        // TODO: Check if policy name matches
+
+        getRepository().addPolicy(orgName, groupName, policy);
+
+        return (success());
+    }
+
+    /**
      * This method determines the CORS header values for accessing a policy.
      *
      * @param servletResponse The servlet response
