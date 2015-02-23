@@ -18,7 +18,6 @@ package io.scepta.generator;
 
 import io.scepta.model.Dependency;
 
-import java.util.Collections;
 import java.util.ServiceLoader;
 
 /**
@@ -38,6 +37,7 @@ public class DependencyResolverManager {
      * @return The set of dependencies
      */
     public static java.util.Set<Dependency> getDependencies(String uri) {
+        java.util.Set<Dependency> ret=new java.util.HashSet<Dependency>();
         int index=uri.indexOf(':');
         String component=uri;
 
@@ -47,12 +47,11 @@ public class DependencyResolverManager {
 
         for (DependencyResolver resolver : RESOLVERS) {
             if (resolver.isTypeSupported(component)) {
-                return (resolver.getDependencies(component));
+                ret.addAll(resolver.getDependencies(component));
             }
         }
 
-        // Check if a default resolver can help
-        return (Collections.<Dependency>emptySet());
+        return (ret);
     }
 
 }

@@ -47,6 +47,26 @@ public class DefaultGenerator implements Generator {
 
     private static final String WEB_XML = "web.xml";
 
+    private static final java.util.Set<Dependency> SPRING_DEPENDENCIES=new java.util.HashSet<Dependency>();
+
+    static {
+        // TODO: Find way to retrieve Spring version
+        SPRING_DEPENDENCIES.add(new Dependency()
+                .setGroupId("org.springframework")
+                .setArtifactId("spring-web")
+                .setVersion("4.1.1.RELEASE"));
+        SPRING_DEPENDENCIES.add(new Dependency()
+                .setGroupId("org.apache.camel")
+                .setArtifactId("camel-spring")
+                .setVersion("2.15-SNAPSHOT"));
+
+        // TODO: See if possible to identify dependencies based on camel xml element names
+        SPRING_DEPENDENCIES.add(new Dependency()
+                .setGroupId("org.apache.camel")
+                .setArtifactId("camel-jsonpath")
+                .setVersion("2.15-SNAPSHOT"));
+    }
+
     @Override
     public GeneratedResult generate(PolicyGroupInterchange group) {
         GeneratedResult ret=new GeneratedResult(group);
@@ -221,6 +241,9 @@ public class DefaultGenerator implements Generator {
             if (war != null) {
                 if (ret != null) {
                     war.addAsWebInfResource(new StringAsset(ret), "classes/camel-config.xml");
+
+                    // Add spring dependency
+                    addDependencies(war, SPRING_DEPENDENCIES);
                 }
 
                 // Add policy dependencies

@@ -4,6 +4,11 @@
             "groupId":"org.apache.activemq",
             "artifactId":"activemq-camel",
             "version":"5.10.0"
+        }],
+        "github":[{
+            "groupId":"org.eclipse.mylyn.github",
+            "artifactId":"org.eclipse.egit.github.core",
+            "version":"2.1.5"
         }]
     }
 }
